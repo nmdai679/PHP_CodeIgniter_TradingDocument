@@ -1,0 +1,14 @@
+Options -Indexes
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Không rewrite nếu là file/thư mục thực
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Chuyển mọi request về index.php của CodeIgniter
+    RewriteRule ^(.*)$ index.php/$1 [L]
+</IfModule>
+
+# Nếu mod_rewrite không hoạt động, dùng URL dạng:
+# localhost/php/cuoi ki/index.php/api/movies
