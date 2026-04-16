@@ -1,0 +1,181 @@
+<div class="container py-4">
+
+    <?php if($this->session->flashdata('success')): ?>
+        <div class="alert alert-success alert-hcmue alert-dismissible fade show mb-4">
+            <i class="fas fa-check-circle me-2"></i><?= $this->session->flashdata('success') ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
+
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <div style="width:46px;height:46px;background:var(--hcmue-gold);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--hcmue-blue);font-size:1.3rem;">
+            <i class="fas fa-cog"></i>
+        </div>
+        <div>
+            <h2 style="font-size:1.2rem;font-weight:800;color:var(--hcmue-blue);margin:0;">Quản trị Admin</h2>
+            <span class="text-muted" style="font-size:0.8rem;">HCMUE Pass Sách</span>
+        </div>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="row g-3 mb-4">
+        <?php
+        $stats = [
+            ['label'=>'Tổng bài đăng', 'value'=>$total_posts,     'icon'=>'fas fa-clipboard-list', 'color'=>'#003F8A', 'bg'=>'#EEF5FF'],
+            ['label'=>'Chờ duyệt',     'value'=>$total_pending,   'icon'=>'fas fa-hourglass-half', 'color'=>'#B45309', 'bg'=>'#FEF3C7'],
+            ['label'=>'Đang Rao',      'value'=>$total_available,  'icon'=>'fas fa-check-circle',   'color'=>'#059669', 'bg'=>'#ECFDF5'],
+            ['label'=>'Đã Pass',       'value'=>$total_sold,       'icon'=>'fas fa-lock',           'color'=>'#6B7280', 'bg'=>'#F3F4F6'],
+            ['label'=>'Người dùng',    'value'=>$total_users,      'icon'=>'fas fa-users',          'color'=>'#D97706', 'bg'=>'#FEF3C7'],
+        ];
+        ?>
+        <?php foreach($stats as $s): ?>
+        <div class="col-6 col-md">
+            <div class="card border-0 rounded-4 p-3 shadow-sm text-center">
+                <div style="width:44px;height:44px;background:<?= $s['bg'] ?>;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
+                    <i class="<?= $s['icon'] ?>" style="color:<?= $s['color'] ?>;font-size:1.1rem;"></i>
+                </div>
+                <div style="font-size:1.6rem;font-weight:800;color:<?= $s['color'] ?>;"><?= $s['value'] ?></div>
+                <div class="text-muted" style="font-size:0.78rem;"><?= $s['label'] ?></div>
+            </div>
+        </div>
+        <?php endforeach; ?>
+    </div>
+
+    <!-- ===== KHU DUYỆT BÀI ===== -->
+    <?php if (!empty($pending_posts)): ?>
+    <div class="card border-0 rounded-4 shadow-sm mb-4 overflow-hidden">
+        <!-- Header nổi bật -->
+        <div class="p-4 d-flex align-items-center gap-3" style="background:linear-gradient(135deg,#B45309,#D97706);">
+            <div style="width:42px;height:42px;background:rgba(255,255,255,0.2);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.2rem;">
+                <i class="fas fa-hourglass-half"></i>
+            </div>
+            <div>
+                <h5 style="color:#fff;font-weight:800;margin:0;">Bài đăng chờ duyệt</h5>
+                <span style="color:rgba(255,255,255,0.8);font-size:0.82rem;"><?= count($pending_posts) ?> bài cần xem xét</span>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" style="font-size:0.85rem;">
+                <thead style="background:#FFFBEB;">
+                    <tr class="text-muted" style="font-size:0.77rem;">
+                        <th style="padding:12px 16px;">Tên sách</th>
+                        <th>Người đăng</th>
+                        <th>Danh mục</th>
+                        <th>Giá</th>
+                        <th>Thời gian đăng</th>
+                        <th class="text-center">Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach($pending_posts as $p): ?>
+                    <tr>
+                        <td style="padding:12px 16px;">
+                            <a href="<?= site_url('trade/detail/'.$p['id']) ?>"
+                               class="text-decoration-none fw-semibold text-dark"
+                               style="font-size:0.88rem;" target="_blank">
+                                <?= htmlspecialchars(mb_strimwidth($p['title'], 0, 55, '...')) ?>
+                                <i class="fas fa-external-link-alt ms-1" style="font-size:0.65rem;color:#9CA3AF;"></i>
+                            </a>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div style="width:28px;height:28px;background:var(--hcmue-blue);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#F5A623;font-weight:700;font-size:0.7rem;flex-shrink:0;">
+                                    <?= strtoupper(substr($p['full_name'] ?: $p['username'], 0, 1)) ?>
+                                </div>
+                                <span><?= htmlspecialchars($p['full_name'] ?: $p['username']) ?></span>
+                            </div>
+                        </td>
+                        <td class="text-muted"><?= $p['category_name'] ?></td>
+                        <td class="text-danger fw-bold"><?= number_format($p['price'],0,',','.') ?>đ</td>
+                        <td class="text-muted" style="font-size:0.77rem;">
+                            <i class="far fa-clock me-1"></i><?= date('d/m/Y H:i', strtotime($p['created_at'])) ?>
+                        </td>
+                        <td class="text-center">
+                            <div class="d-flex gap-2 justify-content-center">
+                                <!-- Nút Duyệt -->
+                                <a href="<?= site_url('admin/approve_post/'.$p['id']) ?>"
+                                   class="btn btn-sm fw-bold"
+                                   style="background:#D1FAE5;color:#065F46;border-radius:8px;font-size:0.8rem;padding:5px 14px;"
+                                   onclick="return confirm('Duyệt và đăng bài này lên trang chủ?');">
+                                    <i class="fas fa-check me-1"></i> Duyệt
+                                </a>
+                                <!-- Nút Từ chối -->
+                                <a href="<?= site_url('admin/reject_post/'.$p['id']) ?>"
+                                   class="btn btn-sm fw-bold"
+                                   style="background:#FEE2E2;color:#991B1B;border-radius:8px;font-size:0.8rem;padding:5px 14px;"
+                                   onclick="return confirm('Từ chối và xóa bài này?');">
+                                    <i class="fas fa-times me-1"></i> Từ chối
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php else: ?>
+    <div class="card border-0 rounded-4 shadow-sm mb-4 p-4 text-center" style="background:#F0FDF4;border:1.5px dashed #86EFAC!important;">
+        <i class="fas fa-check-circle" style="font-size:2rem;color:#22C55E;"></i>
+        <p class="mt-2 mb-0 fw-semibold" style="color:#166534;">Không có bài nào đang chờ duyệt!</p>
+    </div>
+    <?php endif; ?>
+
+    <!-- ===== BẢNG BÀI ĐÃ DUYỆT ===== -->
+    <div class="card border-0 rounded-4 shadow-sm overflow-hidden">
+        <div class="p-3 px-4 border-bottom d-flex align-items-center justify-content-between">
+            <h6 class="mb-0 fw-bold" style="color:var(--hcmue-blue);">
+                <i class="fas fa-list me-2"></i>Bài đã được duyệt (<?= count($recent_posts) ?>)
+            </h6>
+            <a href="<?= site_url('admin/users') ?>" class="btn btn-sm btn-outline-hcmue rounded-3" style="font-size:0.8rem;">
+                <i class="fas fa-users me-1"></i> Người dùng
+            </a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" style="font-size:0.84rem;">
+                <thead style="background:#F8FAFC;">
+                    <tr class="text-muted" style="font-size:0.77rem;">
+                        <th style="padding:12px 16px;">Tên sách</th>
+                        <th>Người đăng</th>
+                        <th>Giá</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày duyệt</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach($recent_posts as $p): ?>
+                    <tr>
+                        <td style="padding:10px 16px;">
+                            <a href="<?= site_url('trade/detail/'.$p['id']) ?>"
+                               class="text-decoration-none fw-semibold text-dark"
+                               style="font-size:0.84rem;">
+                                <?= htmlspecialchars(mb_strimwidth($p['title'], 0, 50, '...')) ?>
+                            </a>
+                        </td>
+                        <td style="font-size:0.82rem;"><?= htmlspecialchars($p['full_name'] ?: $p['username']) ?></td>
+                        <td class="text-danger fw-bold"><?= number_format($p['price'],0,',','.') ?>đ</td>
+                        <td>
+                            <?php if ($p['status']==='available'): ?>
+                                <span class="status-badge-avail">Còn sách</span>
+                            <?php else: ?>
+                                <span class="status-badge-sold">Đã Pass</span>
+                            <?php endif; ?>
+                        </td>
+                        <td class="text-muted" style="font-size:0.77rem;"><?= date('d/m/Y', strtotime($p['created_at'])) ?></td>
+                        <td>
+                            <a href="<?= site_url('admin/delete_post/'.$p['id']) ?>"
+                               class="btn btn-sm btn-outline-danger rounded-2"
+                               onclick="return confirm('Xóa bài đăng này?');"
+                               style="font-size:0.75rem;padding:4px 10px;">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>

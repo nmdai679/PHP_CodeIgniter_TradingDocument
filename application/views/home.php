@@ -1,190 +1,204 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campus Trade Hub | Chợ Pass Tài Liệu Sinh Viên</title>
-    <!-- Bootstrap 5 & FontAwesome -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --primary: #0072bc;
-            --primary-hover: #005b9f;
-            --bg-color: #f8f9fa;
-            --card-radius: 12px;
-        }
-        body {
-            background-color: var(--bg-color);
-            font-family: 'Inter', sans-serif;
-            color: #333;
-        }
-        /* Navbar Styling */
-        .navbar-custom {
-            background-color: var(--primary);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        .navbar-custom .navbar-brand {
-            color: #fff;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-        /* Card Styling */
-        .card-post {
-            border: none;
-            border-radius: var(--card-radius);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            height: 100%;
-        }
-        .card-post:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 10px 25px rgba(0, 114, 188, 0.15);
-        }
-        .card-img-top {
-            height: 220px;
-            object-fit: cover;
-            border-top-left-radius: var(--card-radius);
-            border-top-right-radius: var(--card-radius);
-        }
-        .badge-category {
-            background-color: #e6f2f9;
-            color: var(--primary);
-            font-weight: 600;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-        }
-        .price-tag {
-            font-size: 1.3rem;
-            color: #d93025;
-            font-weight: 700;
-        }
-        .status-sold {
-            opacity: 0.7;
-            filter: grayscale(100%);
-            pointer-events: none;
-        }
-        .btn-primary-custom {
-            background-color: var(--primary);
-            border-color: var(--primary);
-            font-weight: 600;
-            border-radius: 8px;
-        }
-        .btn-primary-custom:hover {
-            background-color: var(--primary-hover);
-        }
-    </style>
-</head>
-<body>
-
-<nav class="navbar navbar-expand-lg navbar-custom sticky-top py-3">
+<!-- Search & Filter Bar -->
+<div class="search-section">
     <div class="container">
-        <a class="navbar-brand" href="<?= site_url('trade') ?>"><i class="fas fa-graduation-cap me-2"></i>Campus Trade Hub</a>
-        <button class="btn btn-light text-primary fw-bold rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#createPostModal">
-            <i class="fas fa-plus me-1"></i> Đăng Tài Liệu
-        </button>
+        <form action="<?= site_url('trade') ?>" method="GET" class="d-flex gap-3 align-items-center flex-wrap">
+            <div class="search-input-wrap flex-grow-1" style="min-width:200px;max-width:400px;">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" name="q" value="<?= htmlspecialchars($keyword ?? '') ?>"
+                       placeholder="Tìm sách, giáo trình...">
+            </div>
+            <div class="filter-scroll flex-grow-1">
+                <a href="<?= site_url('trade') ?>"
+                   class="cat-filter-btn <?= (!$active_cat) ? 'active' : '' ?>">
+                    <i class="fas fa-th-large me-1"></i> Tất cả
+                </a>
+                <?php foreach($categories as $cat): ?>
+                    <a href="<?= site_url('trade?cat=' . $cat['id']) ?>"
+                       class="cat-filter-btn <?= ($active_cat == $cat['id']) ? 'active' : '' ?>">
+                        <i class="<?= $cat['icon'] ?> me-1"></i> <?= $cat['category_name'] ?>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+            <?php if($keyword || $active_cat): ?>
+                <a href="<?= site_url('trade') ?>" class="text-muted text-decoration-none" style="font-size:0.82rem;white-space:nowrap;">
+                    <i class="fas fa-times me-1"></i>Xóa lọc
+                </a>
+            <?php endif; ?>
+        </form>
     </div>
-</nav>
+</div>
 
-<div class="container py-5">
+<!-- Main Content -->
+<div class="container py-4">
+
+    <!-- Flash Messages -->
     <?php if($this->session->flashdata('success')): ?>
-        <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm border-0" role="alert">
+        <div class="alert alert-success alert-hcmue alert-dismissible fade show mb-4" role="alert">
             <i class="fas fa-check-circle me-2"></i><?= $this->session->flashdata('success') ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
+    <?php if($this->session->flashdata('error')): ?>
+        <div class="alert alert-danger alert-hcmue alert-dismissible fade show mb-4" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i><?= $this->session->flashdata('error') ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     <?php endif; ?>
 
-    <h3 class="fw-bold mb-4" style="color: var(--primary);">Khám phá tài liệu <i class="fas fa-book-open ms-2"></i></h3>
+    <!-- Section Title -->
+    <div class="d-flex align-items-center mb-4">
+        <h2 class="section-title flex-grow-1">
+            <i class="fas fa-book-open" style="font-size:1.1rem;"></i>
+            <?php if($keyword): ?>
+                Kết quả cho "<em><?= htmlspecialchars($keyword) ?></em>"
+            <?php elseif($active_cat): ?>
+                <?php $cur_cat = array_filter($categories, fn($c) => $c['id'] == $active_cat);
+                      $cur_cat = reset($cur_cat); ?>
+                <?= $cur_cat ? $cur_cat['category_name'] : 'Danh mục' ?>
+            <?php else: ?>
+                Sách đang được Pass
+            <?php endif; ?>
+        </h2>
+        <span class="ms-3 text-muted" style="font-size:0.83rem;white-space:nowrap;">
+            <?= count($posts) ?> bài đăng
+        </span>
+    </div>
 
-    <div class="row g-4">
-        <?php foreach($posts as $post): ?>
-            <div class="col-12 col-md-6 col-lg-4">
-                <div class="card card-post <?= $post['status'] == 'sold' ? 'status-sold bg-light' : '' ?>">
-                    <img src="<?= base_url($post['image_url']) ?>" class="card-img-top" alt="<?= $post['title'] ?>" onerror="this.src='https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=400&q=80';">
-                    <div class="card-body p-4 d-flex flex-column">
-                        <div class="mb-2">
-                            <span class="badge-category"><?= $post['category_name'] ?></span>
+    <!-- Cards Grid -->
+    <?php if (empty($posts)): ?>
+        <div class="text-center py-5">
+            <i class="fas fa-box-open" style="font-size:3rem;color:#CBD5E1;"></i>
+            <p class="mt-3 text-muted" style="font-size:0.95rem;">
+                Không có bài đăng nào phù hợp.<br>
+                <?php if($this->session->userdata('logged_in')): ?>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#createPostModal" class="link-hcmue">
+                        Đăng sách của bạn ngay!
+                    </a>
+                <?php else: ?>
+                    <a href="<?= site_url('auth') ?>" class="link-hcmue">Đăng nhập để đăng bài</a>
+                <?php endif; ?>
+            </p>
+        </div>
+    <?php else: ?>
+        <div class="row g-4">
+            <?php foreach($posts as $post): ?>
+            <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+                <div class="card-post d-flex flex-column <?= $post['status'] === 'sold' ? 'card-sold' : '' ?>">
+
+                    <!-- Image -->
+                    <a href="<?= site_url('trade/detail/' . $post['id']) ?>" class="d-block overflow-hidden" style="border-radius:16px 16px 0 0;">
+                        <img src="<?= base_url($post['image_url']) ?>"
+                             class="post-img"
+                             alt="<?= htmlspecialchars($post['title']) ?>"
+                             onerror="this.src='https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=400&q=80';">
+                    </a>
+
+                    <!-- Body -->
+                    <div class="p-3 d-flex flex-column flex-grow-1">
+                        <!-- Category + Status -->
+                        <div class="d-flex align-items-center justify-content-between mb-2 gap-1 flex-wrap">
+                            <span class="badge-cat">
+                                <i class="<?= $post['cat_icon'] ?? 'fas fa-book' ?>"></i>
+                                <?= $post['category_name'] ?>
+                            </span>
+                            <?php if ($post['status'] === 'available'): ?>
+                                <span class="status-badge-avail"><i class="fas fa-circle" style="font-size:6px;"></i> Còn sách</span>
+                            <?php else: ?>
+                                <span class="status-badge-sold"><i class="fas fa-lock" style="font-size:10px;"></i> Đã Pass</span>
+                            <?php endif; ?>
                         </div>
-                        <h5 class="card-title fw-bold text-dark mb-2" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                            <?= $post['title'] ?>
-                        </h5>
-                        <p class="card-text text-muted small mb-3 flex-grow-1"><?= htmlspecialchars($post['description']) ?></p>
-                        <hr class="text-muted opacity-25">
-                        <div class="d-flex justify-content-between align-items-center mb-0">
+
+                        <!-- Title -->
+                        <a href="<?= site_url('trade/detail/' . $post['id']) ?>"
+                           class="text-decoration-none text-dark fw-bold mb-1"
+                           style="font-size:0.92rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4;">
+                            <?= htmlspecialchars($post['title']) ?>
+                        </a>
+
+                        <!-- Seller + Rating -->
+                        <div class="d-flex align-items-center gap-1 mb-2" style="font-size:0.78rem;color:#6B7280;">
+                            <i class="fas fa-user-circle" style="color:#003F8A;"></i>
+                            <span><?= htmlspecialchars($post['full_name'] ?: $post['username']) ?></span>
+                            <span class="mx-1">·</span>
+                            <?php if ($post['avg_rating'] > 0): ?>
+                                <span class="star-display">
+                                    <?php for($s=1;$s<=5;$s++): ?>
+                                        <i class="<?= $s <= round($post['avg_rating']) ? 'fas' : 'far' ?> fa-star"></i>
+                                    <?php endfor; ?>
+                                    <span style="color:#6B7280;">(<?= $post['total_ratings'] ?>)</span>
+                                </span>
+                            <?php else: ?>
+                                <span class="star-display"><span class="no-rating">Chưa có đánh giá</span></span>
+                            <?php endif; ?>
+                        </div>
+
+                        <!-- Description snippet -->
+                        <p class="text-muted mb-2 flex-grow-1"
+                           style="font-size:0.8rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.5;">
+                            <?= htmlspecialchars($post['description'] ?: 'Không có mô tả') ?>
+                        </p>
+
+                        <hr class="my-2" style="border-color:#F1F5F9;">
+
+                        <!-- Price + Actions -->
+                        <div class="d-flex align-items-center justify-content-between gap-1 flex-wrap">
                             <span class="price-tag"><?= number_format($post['price'], 0, ',', '.') ?>đ</span>
-                            <div style="pointer-events: auto;">
-                                <?php if($post['status'] == 'available'): ?>
-                                    <a href="<?= site_url('trade/update_status/'.$post['id']) ?>" class="btn btn-sm btn-outline-success fw-bold rounded-3" title="Chốt đơn/Đã Pass">
-                                        <i class="fas fa-check"></i> Đã Pass
+                            <div class="d-flex gap-1">
+                                <!-- SĐT nếu được bật -->
+                                <?php if ($post['phone_visible'] && $post['phone']): ?>
+                                    <a href="tel:<?= $post['phone'] ?>"
+                                       class="btn btn-sm btn-outline-success rounded-3 fw-bold"
+                                       style="font-size:0.75rem;" title="Gọi điện">
+                                        <i class="fas fa-phone"></i>
                                     </a>
-                                <?php else: ?>
-                                    <span class="badge bg-secondary fw-bold p-2"><i class="fas fa-lock"></i> Đã giao dịch</span>
                                 <?php endif; ?>
-                                <a href="<?= site_url('trade/delete/'.$post['id']) ?>" class="btn btn-sm btn-outline-danger ms-1 rounded-3" onclick="return confirm('Bạn có chắc chắn muốn xóa bài đăng này?');" title="Xóa">
-                                    <i class="fas fa-trash"></i>
-                                </a>
+
+                                <?php if ($this->session->userdata('logged_in')): ?>
+                                    <?php $cur_uid = $this->session->userdata('user_id'); ?>
+                                    <?php if ($post['user_id'] != $cur_uid): ?>
+                                        <!-- Nhắn tin -->
+                                        <a href="<?= site_url('message/conversation/' . $post['user_id']) ?>"
+                                           class="btn btn-sm btn-primary-hcmue rounded-3"
+                                           style="font-size:0.75rem;" title="Nhắn tin">
+                                            <i class="fas fa-comment"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                    <?php if ($post['user_id'] == $cur_uid || $this->session->userdata('role') === 'admin'): ?>
+                                        <?php if ($post['status'] === 'available'): ?>
+                                            <a href="<?= site_url('trade/update_status/' . $post['id']) ?>"
+                                               class="btn btn-sm btn-outline-success rounded-3 fw-bold"
+                                               style="font-size:0.75rem;" title="Đánh dấu Đã Pass"
+                                               onclick="return confirm('Đánh dấu sách này là Đã Pass?');">
+                                                <i class="fas fa-check"></i>
+                                            </a>
+                                        <?php endif; ?>
+                                        <a href="<?= site_url('trade/delete/' . $post['id']) ?>"
+                                           class="btn btn-sm btn-outline-danger rounded-3"
+                                           style="font-size:0.75rem;" title="Xóa"
+                                           onclick="return confirm('Bạn có chắc muốn xóa bài này?');">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                <?php endif; ?>
                             </div>
                         </div>
+
+                        <!-- Meta: time + comments -->
+                        <div class="d-flex gap-3 mt-2" style="font-size:0.74rem;color:#9CA3AF;">
+                            <span><i class="far fa-clock me-1"></i><?= date('d/m/Y', strtotime($post['created_at'])) ?></span>
+                            <span><i class="far fa-comment me-1"></i><?= $post['comment_count'] ?> bình luận</span>
+                        </div>
                     </div>
-                    <div class="card-footer bg-white border-0 px-4 pb-3 pt-0 text-muted small fw-medium">
-                        <i class="fas fa-user-circle me-1 text-primary"></i> <?= $post['username'] ?> &bull; <i class="far fa-clock ms-1"></i> <?= date('d/m/Y', strtotime($post['created_at'])) ?>
-                    </div>
+
                 </div>
             </div>
-        <?php endforeach; ?>
-    </div>
-</div>
-
-<!-- Modal Đăng Bài (Minimalism, Bo tròn tĩnh tế) -->
-<div class="modal fade" id="createPostModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content shadow-lg" style="border-radius: var(--card-radius); border: none;">
-            <div class="modal-header border-0 pb-0 pt-4 px-4">
-                <h4 class="modal-title fw-bold" style="color: var(--primary);">Đăng tài liệu lên Chợ Pass</h4>
-                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-4">
-                <form action="<?= site_url('trade/create') ?>" method="POST" enctype="multipart/form-data">
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold text-secondary">Tên tài liệu / Sách</label>
-                        <input type="text" class="form-control form-control-lg rounded-3 fs-6" name="title" required placeholder="Nhập tên giáo trình, tài liệu...">
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-semibold text-secondary">Danh mục môn học</label>
-                            <select class="form-select form-select-lg rounded-3 fs-6" name="category_id" required>
-                                <option value="">-- Chọn danh mục --</option>
-                                <?php foreach($categories as $cat): ?>
-                                    <option value="<?= $cat['id'] ?>"><?= $cat['category_name'] ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-semibold text-secondary">Giá Pass (VNĐ)</label>
-                            <div class="input-group">
-                                <input type="number" class="form-control form-control-lg rounded-start fs-6" name="price" required placeholder="Ví dụ: 50000">
-                                <span class="input-group-text rounded-end fw-bold text-muted border-start-0 bg-light">VNĐ</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold text-secondary">Tình trạng & Mô tả chi tiết</label>
-                        <textarea class="form-control rounded-3" name="description" rows="4" placeholder="Sách bao nhiêu %, có ghi chú/highlight gì bên trong không..."></textarea>
-                    </div>
-                    <div class="mb-4">
-                        <label class="form-label fw-semibold text-secondary">Hình ảnh thực tế <small class="text-muted fw-normal">(Khuyên dùng tỉ lệ 16:9)</small></label>
-                        <input type="file" class="form-control form-control-lg rounded-3 fs-6" name="image" accept="image/*">
-                    </div>
-                    <button type="submit" class="btn btn-primary-custom w-100 py-3 fs-5 rounded-3">Gửi Bài Đăng <i class="fas fa-paper-plane ms-2"></i></button>
-                </form>
-            </div>
+            <?php endforeach; ?>
         </div>
-    </div>
+    <?php endif; ?>
+
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+<style>
+.link-hcmue { color:#0052B4;font-weight:600;text-decoration:none; }
+.link-hcmue:hover { text-decoration:underline; }
+</style>

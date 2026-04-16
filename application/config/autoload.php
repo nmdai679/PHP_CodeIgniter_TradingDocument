@@ -6,7 +6,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 |  Auto-load Libraries
 | -------------------------------------------------------------------
 */
-$autoload['libraries'] = array();
+$autoload['libraries'] = array('session', 'database');
 
 /*
 | -------------------------------------------------------------------
