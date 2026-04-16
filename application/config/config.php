@@ -19,7 +19,7 @@ if (isset($_SERVER['HTTP_HOST'])) {
 | Index File
 |--------------------------------------------------------------------------
 */
-$config['index_page'] = 'index.php';  // Rỗng khi dùng .htaccess
+$config['index_page'] = '';  // Rỗng khi dùng .htaccess
 
 /*
 |--------------------------------------------------------------------------

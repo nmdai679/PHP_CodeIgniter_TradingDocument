@@ -1,0 +1,23 @@
+# CodeIgniter 3 Gitignore
+project.zip
+/application/logs/*
+!/application/logs/index.html
+/application/cache/*
+!/application/cache/index.html
+
+# User Uploads (Ignore sample/real uploads, keep folder structure)
+/assets/uploads/*
+!/assets/uploads/default.png
+!/assets/uploads/index.html
+
+# Environment / Database sensitive (Optional but professional)
+# /application/config/database.php
+
+# IDEs and OS junk
+.idea/
+.vscode/
+*.swp
+*.bak
+Thumbs.db
+.DS_Store
+*error_log
