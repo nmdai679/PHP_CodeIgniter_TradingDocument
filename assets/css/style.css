@@ -296,15 +296,38 @@ body {
     transform : translateY(-10px) !important;
     box-shadow: var(--shadow-hover) !important;
 }
+/* Image wrapper — giữ tỉ lệ, bo góc trên */
+.card-img-link {
+    display         : block;
+    overflow        : hidden;
+    border-radius   : 16px 16px 0 0;
+    aspect-ratio    : 4 / 3;
+    background-color: #EEF2F9;           /* nền xanh nhạt khi ảnh chưa tải */
+    background-image: linear-gradient(
+        90deg,
+        #EEF2F9 25%, #dde5f4 50%, #EEF2F9 75%
+    );
+    background-size : 400% 100%;
+    animation       : shimmer 1.6s ease infinite;
+}
+@keyframes shimmer {
+    0%   { background-position: 100% 0; }
+    100% { background-position: -100% 0; }
+}
+/* Dừng shimmer khi ảnh đã load xong */
+.card-img-link:has(img[src]) {
+    animation: none;
+    background-image: none;
+}
 .trade-card .post-img {
-    height    : 220px !important;
     width     : 100%;
+    height    : 100%;
     object-fit: cover;
     display   : block;
     transition: transform 0.4s ease;
 }
 .trade-card:hover .post-img {
-    transform: scale(1.04);
+    transform: scale(1.05);
 }
 
 /* Sold card grayed-out */

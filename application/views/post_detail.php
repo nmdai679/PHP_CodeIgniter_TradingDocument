@@ -26,11 +26,18 @@
         <div class="row g-0">
             <!-- Image -->
             <div class="col-md-5">
-                <img src="<?= base_url($post['image_url']) ?>"
+                <?php
+                    $img_path = FCPATH . $post['image_url'];
+                    $img_src  = (!empty($post['image_url']) && file_exists($img_path))
+                                ? base_url($post['image_url'])
+                                : base_url('assets/images/default_book.jpg');
+                ?>
+                <img src="<?= $img_src ?>"
                      class="img-fluid h-100 w-100"
                      style="object-fit:cover;min-height:300px;max-height:420px;"
                      alt="<?= htmlspecialchars($post['title']) ?>"
-                     onerror="this.src='https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=600&q=80';">
+                     loading="lazy"
+                     onerror="this.onerror=null;this.src='<?= base_url('assets/images/default_book.jpg') ?>';">
             </div>
             <!-- Info -->
             <div class="col-md-7 p-4 d-flex flex-column">

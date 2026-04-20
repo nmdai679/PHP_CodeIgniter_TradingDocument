@@ -86,11 +86,18 @@
                 <div class="card trade-card d-flex flex-column <?= $post['status'] === 'sold' ? 'card-sold' : '' ?>">
 
                     <!-- Image -->
-                    <a href="<?= site_url('trade/detail/' . $post['id']) ?>" class="d-block overflow-hidden" style="border-radius:16px 16px 0 0;">
-                        <img src="<?= base_url($post['image_url']) ?>"
+                    <a href="<?= site_url('trade/detail/' . $post['id']) ?>" class="d-block card-img-link">
+                        <?php
+                            $img_path = FCPATH . $post['image_url'];
+                            $img_src  = (!empty($post['image_url']) && file_exists($img_path))
+                                        ? base_url($post['image_url'])
+                                        : base_url('assets/images/default_book.png');
+                        ?>
+                        <img src="<?= $img_src ?>"
                              class="post-img"
                              alt="<?= htmlspecialchars($post['title']) ?>"
-                             onerror="this.src='https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=400&q=80';">
+                             loading="lazy"
+                             onerror="this.onerror=null;this.src='<?= base_url('assets/images/default_book.jpg') ?>';">
                     </a>
 
                     <!-- Body -->
@@ -111,7 +118,7 @@
                         <!-- Title -->
                         <a href="<?= site_url('trade/detail/' . $post['id']) ?>"
                            class="text-decoration-none text-dark fw-bold mb-1"
-                           style="font-size:0.92rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4;">
+                           style="font-size:0.92rem;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4;">
                             <?= htmlspecialchars($post['title']) ?>
                         </a>
 
@@ -134,7 +141,7 @@
 
                         <!-- Description snippet -->
                         <p class="text-muted mb-2 flex-grow-1"
-                           style="font-size:0.8rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.5;">
+                           style="font-size:0.8rem;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.5;">
                             <?= htmlspecialchars($post['description'] ?: 'Không có mô tả') ?>
                         </p>
 

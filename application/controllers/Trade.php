@@ -1,6 +1,15 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+/**
+ * @property CI_Session $session
+ * @property CI_Input $input
+ * @property CI_Upload $upload
+ * @property Trade_model $Trade_model
+ * @property Comment_model $Comment_model
+ * @property Rating_model $Rating_model
+ * @property Message_model $Message_model
+ */
 class Trade extends CI_Controller {
 
     public function __construct() {
@@ -78,21 +87,31 @@ class Trade extends CI_Controller {
         $user_id = $this->session->userdata('user_id');
 
         // Cấu hình upload thư mục assets/uploads/
-        $config['upload_path']   = './assets/uploads/';
-        $config['allowed_types'] = 'gif|jpg|png|jpeg';
+        $upload_dir = FCPATH . 'assets/uploads/';
+        if (!is_dir($upload_dir)) {
+            mkdir($upload_dir, 0777, TRUE);
+        }
+
+        $config['upload_path']   = $upload_dir;
+        $config['allowed_types'] = 'gif|jpg|png|jpeg|webp';
         $config['max_size']      = 5120; // 5MB
         $config['encrypt_name']  = TRUE;
 
-        if (!is_dir('./assets/uploads/')) {
-            mkdir('./assets/uploads/', 0777, TRUE);
-        }
-
         $this->upload->initialize($config);
-        $image_url = 'assets/uploads/default.png';
+        
+        $image_url = ''; // Rỗng để lúc hiển thị view sẽ tự fallback default_book.jpg
 
-        if ($this->upload->do_upload('image')) {
-            $uploadData = $this->upload->data();
-            $image_url  = 'assets/uploads/' . $uploadData['file_name'];
+        // Kiểm tra xem user có chọn file upload không
+        if (!empty($_FILES['image']['name'])) {
+            if ($this->upload->do_upload('image')) {
+                $uploadData = $this->upload->data();
+                $image_url  = 'assets/uploads/' . $uploadData['file_name'];
+            } else {
+                // Nếu có chọn file nhưng lỗi (quá dung lượng, sai định dạng...)
+                $this->session->set_flashdata('error', 'Lỗi upload ảnh: ' . strip_tags($this->upload->display_errors()));
+                redirect('trade');
+                return;
+            }
         }
 
         $post_data = [
@@ -102,11 +121,18 @@ class Trade extends CI_Controller {
             'description' => $this->input->post('description', TRUE),
             'price'       => $this->input->post('price'),
             'image_url'   => $image_url,
-            'status'      => 'pending'  // Chờ Admin duyệt
+            // Admin đăng thì duyệt luôn, user thường thì chờ duyệt
+            'status'      => ($this->session->userdata('role') === 'admin') ? 'available' : 'pending'
         ];
 
         $this->Trade_model->insert_post($post_data);
-        $this->session->set_flashdata('success', '✅ Đăng bài thành công! Bài của bạn đang chờ Admin duyệt. Vui lòng chờ trong ít phút.');
+
+        if ($this->session->userdata('role') === 'admin') {
+            $this->session->set_flashdata('success', '✅ Đăng bài thành công!');
+        } else {
+            $this->session->set_flashdata('success', '✅ Đăng bài thành công! Bài của bạn đang chờ Admin duyệt.');
+        }
+        
         redirect('trade');
     }
 

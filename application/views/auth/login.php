@@ -34,14 +34,19 @@
             from { opacity:0; transform:translateY(24px); }
             to   { opacity:1; transform:translateY(0); }
         }
-        .auth-logo {
-            width: 80px; height: 80px;
+        .auth-logo a {
+            display: block;
+            width: 90px; height: 90px;
             margin: 0 auto 20px;
-            display: flex; align-items: center; justify-content: center;
         }
-        .auth-logo img {
+        .auth-logo a img {
             width: 100%; height: 100%;
             object-fit: contain;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+        .auth-logo a:hover img {
+            opacity: 0.75;
+            transform: scale(0.95);
         }
         .auth-title {
             font-size: 1.6rem; font-weight: 800;
@@ -107,7 +112,9 @@
 
 <div class="auth-card">
     <div class="auth-logo">
-        <img src="<?= base_url('assets/images/logo_hcmue.png') ?>" alt="Logo HCMUE">
+        <a href="<?= base_url() ?>" title="Về trang chủ HCMUE Pass Sách">
+            <img src="<?= base_url('assets/images/logo_hcmue.png') ?>" alt="Logo HCMUE">
+        </a>
     </div>
     <h1 class="auth-title">Chào mừng trở lại!</h1>
     <p class="auth-subtitle">Đăng nhập vào <strong>HCMUE Pass Sách</strong></p>
