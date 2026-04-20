@@ -498,3 +498,75 @@ INFO - 2026-04-10 09:10:18 --> Language Class Initialized
 INFO - 2026-04-10 09:10:18 --> Language Class Initialized
 ERROR - 2026-04-10 09:10:18 --> 404 Page Not Found: Assets/uploads
 ERROR - 2026-04-10 09:10:18 --> 404 Page Not Found: Assets/uploads
+INFO - 2026-04-10 10:33:42 --> Config Class Initialized
+INFO - 2026-04-10 10:33:42 --> Hooks Class Initialized
+DEBUG - 2026-04-10 10:33:42 --> UTF-8 Support Enabled
+INFO - 2026-04-10 10:33:42 --> Utf8 Class Initialized
+INFO - 2026-04-10 10:33:42 --> URI Class Initialized
+DEBUG - 2026-04-10 10:33:42 --> No URI present. Default controller set.
+INFO - 2026-04-10 10:33:42 --> Router Class Initialized
+INFO - 2026-04-10 10:33:42 --> Output Class Initialized
+INFO - 2026-04-10 10:33:42 --> Security Class Initialized
+DEBUG - 2026-04-10 10:33:42 --> Global POST, GET and COOKIE data sanitized
+INFO - 2026-04-10 10:33:42 --> Input Class Initialized
+INFO - 2026-04-10 10:33:42 --> Language Class Initialized
+INFO - 2026-04-10 10:33:42 --> Loader Class Initialized
+INFO - 2026-04-10 10:33:42 --> Helper loaded: url_helper
+INFO - 2026-04-10 10:33:42 --> Controller Class Initialized
+INFO - 2026-04-10 10:33:42 --> Database Driver Class Initialized
+INFO - 2026-04-10 10:33:42 --> Model "Trade_model" initialized
+INFO - 2026-04-10 10:33:42 --> Helper loaded: form_helper
+DEBUG - 2026-04-10 10:33:42 --> Session: "sess_save_path" is empty; using "session.save_path" value from php.ini.
+INFO - 2026-04-10 10:33:42 --> Session: Class initialized using 'files' driver.
+INFO - 2026-04-10 10:33:42 --> Upload Class Initialized
+INFO - 2026-04-10 10:33:42 --> File loaded: C:\xampp\htdocs\php\FINALSECTION\application\views\home.php
+INFO - 2026-04-10 10:33:42 --> Final output sent to browser
+DEBUG - 2026-04-10 10:33:42 --> Total execution time: 0.0621
+INFO - 2026-04-10 10:33:42 --> Config Class Initialized
+INFO - 2026-04-10 10:33:42 --> Hooks Class Initialized
+DEBUG - 2026-04-10 10:33:42 --> UTF-8 Support Enabled
+INFO - 2026-04-10 10:33:42 --> Utf8 Class Initialized
+INFO - 2026-04-10 10:33:42 --> Config Class Initialized
+INFO - 2026-04-10 10:33:42 --> Hooks Class Initialized
+INFO - 2026-04-10 10:33:42 --> URI Class Initialized
+INFO - 2026-04-10 10:33:42 --> Router Class Initialized
+DEBUG - 2026-04-10 10:33:42 --> UTF-8 Support Enabled
+INFO - 2026-04-10 10:33:42 --> Utf8 Class Initialized
+INFO - 2026-04-10 10:33:42 --> Output Class Initialized
+INFO - 2026-04-10 10:33:42 --> Security Class Initialized
+INFO - 2026-04-10 10:33:42 --> URI Class Initialized
+DEBUG - 2026-04-10 10:33:42 --> Global POST, GET and COOKIE data sanitized
+INFO - 2026-04-10 10:33:42 --> Input Class Initialized
+INFO - 2026-04-10 10:33:42 --> Router Class Initialized
+INFO - 2026-04-10 10:33:42 --> Language Class Initialized
+INFO - 2026-04-10 10:33:42 --> Output Class Initialized
+ERROR - 2026-04-10 10:33:42 --> 404 Page Not Found: Assets/uploads
+INFO - 2026-04-10 10:33:42 --> Security Class Initialized
+INFO - 2026-04-10 10:33:42 --> Config Class Initialized
+INFO - 2026-04-10 10:33:42 --> Hooks Class Initialized
+DEBUG - 2026-04-10 10:33:42 --> Global POST, GET and COOKIE data sanitized
+INFO - 2026-04-10 10:33:42 --> Input Class Initialized
+INFO - 2026-04-10 10:33:42 --> Config Class Initialized
+INFO - 2026-04-10 10:33:42 --> Hooks Class Initialized
+INFO - 2026-04-10 10:33:42 --> Language Class Initialized
+DEBUG - 2026-04-10 10:33:42 --> UTF-8 Support Enabled
+ERROR - 2026-04-10 10:33:42 --> 404 Page Not Found: Assets/uploads
+INFO - 2026-04-10 10:33:42 --> Utf8 Class Initialized
+INFO - 2026-04-10 10:33:42 --> URI Class Initialized
+DEBUG - 2026-04-10 10:33:42 --> UTF-8 Support Enabled
+INFO - 2026-04-10 10:33:42 --> Utf8 Class Initialized
+INFO - 2026-04-10 10:33:42 --> URI Class Initialized
+INFO - 2026-04-10 10:33:42 --> Router Class Initialized
+INFO - 2026-04-10 10:33:42 --> Output Class Initialized
+INFO - 2026-04-10 10:33:42 --> Router Class Initialized
+INFO - 2026-04-10 10:33:42 --> Security Class Initialized
+INFO - 2026-04-10 10:33:42 --> Output Class Initialized
+DEBUG - 2026-04-10 10:33:42 --> Global POST, GET and COOKIE data sanitized
+INFO - 2026-04-10 10:33:42 --> Input Class Initialized
+INFO - 2026-04-10 10:33:42 --> Security Class Initialized
+INFO - 2026-04-10 10:33:42 --> Language Class Initialized
+DEBUG - 2026-04-10 10:33:42 --> Global POST, GET and COOKIE data sanitized
+ERROR - 2026-04-10 10:33:42 --> 404 Page Not Found: Assets/uploads
+INFO - 2026-04-10 10:33:42 --> Input Class Initialized
+INFO - 2026-04-10 10:33:42 --> Language Class Initialized
+ERROR - 2026-04-10 10:33:42 --> 404 Page Not Found: Assets/uploads

@@ -83,7 +83,7 @@
         <div class="row g-4">
             <?php foreach($posts as $post): ?>
             <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
-                <div class="card-post d-flex flex-column <?= $post['status'] === 'sold' ? 'card-sold' : '' ?>">
+                <div class="card trade-card d-flex flex-column <?= $post['status'] === 'sold' ? 'card-sold' : '' ?>">
 
                     <!-- Image -->
                     <a href="<?= site_url('trade/detail/' . $post['id']) ?>" class="d-block overflow-hidden" style="border-radius:16px 16px 0 0;">
