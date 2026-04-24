@@ -28,6 +28,14 @@ class Rating_model extends CI_Model {
         ])->num_rows() > 0;
     }
 
+    // Kiểm tra đã đánh giá theo order_id (Shopee-style)
+    public function has_rated_order($order_id, $reviewer_id) {
+        return $this->db->get_where('ratings', [
+            'order_id'    => $order_id,
+            'reviewer_id' => $reviewer_id
+        ])->num_rows() > 0;
+    }
+
     // Thêm đánh giá
     public function add_rating($data) {
         return $this->db->insert('ratings', $data);

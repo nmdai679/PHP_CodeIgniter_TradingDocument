@@ -71,7 +71,11 @@
                         <?= strtoupper(substr($post['full_name'] ?: $post['username'], 0, 1)) ?>
                     </div>
                     <div>
-                        <div style="font-weight:700;font-size:0.9rem;"><?= htmlspecialchars($post['full_name'] ?: $post['username']) ?></div>
+                        <a href="<?= site_url('seller/' . $post['seller_id']) ?>"
+                           class="text-decoration-none" style="font-weight:700;font-size:0.9rem;color:var(--hcmue-blue);">
+                            <?= htmlspecialchars($post['full_name'] ?: $post['username']) ?>
+                            <i class="fas fa-external-link-alt ms-1" style="font-size:0.65rem;"></i>
+                        </a>
                         <div class="star-display">
                             <?php if ($post['avg_rating'] > 0): ?>
                                 <?php for($s=1;$s<=5;$s++): ?>
@@ -93,40 +97,69 @@
                 </div>
 
                 <!-- Actions -->
-                <div class="d-flex gap-2 mt-auto flex-wrap">
-                    <?php $logged_in = $this->session->userdata('logged_in'); ?>
-                    <?php $cur_uid   = $this->session->userdata('user_id'); ?>
+                <div class="mt-auto">
+                <?php $logged_in = $this->session->userdata('logged_in'); ?>
+                <?php $cur_uid   = $this->session->userdata('user_id'); ?>
 
-                    <?php if ($logged_in && $post['seller_id'] != $cur_uid): ?>
-                        <a href="<?= site_url('message/conversation/' . $post['seller_id'] . '?post_id=' . $post['id']) ?>"
-                           class="btn btn-primary-hcmue flex-grow-1 py-2" style="font-size:0.9rem;">
-                            <i class="fas fa-comment-dots me-1"></i> Nhắn tin hỏi sách
-                        </a>
-                        <?php if ($post['phone_visible'] && $post['phone']): ?>
-                            <a href="tel:<?= $post['phone'] ?>" class="btn btn-outline-success py-2">
-                                <i class="fas fa-phone"></i>
+                <?php if ($post['status'] === 'available' && $logged_in && $post['seller_id'] != $cur_uid): ?>
+                    <!-- Form yêu cầu mua -->
+                    <form action="<?= site_url('orders/request/' . $post['id']) ?>" method="POST"
+                          class="p-3 rounded-4 mb-3" style="background:#F0F7FF;border:1.5px solid #DBEAFE;">
+                        <div class="fw-bold mb-2" style="font-size:0.88rem;color:var(--hcmue-blue);"><i class="fas fa-shopping-bag me-1"></i>Yêu cầu mua sách</div>
+                        <div class="d-flex gap-2 mb-2">
+                            <div style="flex:0 0 120px;">
+                                <label class="form-label-hcmue">Số lượng</label>
+                                <input type="number" name="quantity" min="1" max="<?= $post['quantity'] ?>" value="1"
+                                       class="form-control form-control-hcmue text-center" style="font-weight:700;">
+                            </div>
+                            <div class="flex-grow-1">
+                                <label class="form-label-hcmue">Ghi chú cho người bán (tùy chọn)</label>
+                                <input type="text" name="note" class="form-control form-control-hcmue"
+                                       placeholder="VD: Mình đang ở KTX A, có thể gặp buổi sáng...">
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button type="submit" class="btn btn-primary-hcmue flex-grow-1 py-2"
+                                    onclick="return confirm('Gửi yêu cầu mua sách này?');">
+                                <i class="fas fa-shopping-cart me-1"></i>Gửi yêu cầu mua
+                            </button>
+                            <a href="<?= site_url('message/conversation/' . $post['seller_id'] . '?post_id=' . $post['id']) ?>"
+                               class="btn btn-outline-secondary py-2" title="Nhắn tin hỏi thêm">
+                                <i class="fas fa-comment-dots"></i>
                             </a>
-                        <?php endif; ?>
-                    <?php elseif (!$logged_in): ?>
-                        <a href="<?= site_url('auth') ?>" class="btn btn-primary-hcmue flex-grow-1 py-2">
-                            <i class="fas fa-sign-in-alt me-1"></i> Đăng nhập để nhắn tin
-                        </a>
-                    <?php endif; ?>
+                            <?php if ($post['phone_visible'] && $post['phone']): ?>
+                                <a href="tel:<?= $post['phone'] ?>" class="btn btn-outline-success py-2" title="Gọi điện">
+                                    <i class="fas fa-phone"></i>
+                                </a>
+                            <?php endif; ?>
+                        </div>
+                    </form>
+                <?php elseif ($post['status'] === 'sold' && $logged_in && $post['seller_id'] != $cur_uid): ?>
+                    <div class="alert border-0 rounded-3 mb-3" style="background:#F3F4F6;color:#6B7280;font-size:0.88rem;">
+                        <i class="fas fa-lock me-2"></i>Sách này đã hết hàng.
+                        <a href="<?= site_url('seller/' . $post['seller_id']) ?>" class="ms-2" style="color:var(--hcmue-blue);font-weight:600;">Xem sàn người bán</a>
+                    </div>
+                <?php elseif (!$logged_in): ?>
+                    <a href="<?= site_url('auth') ?>" class="btn btn-primary-hcmue w-100 py-2 mb-3">
+                        <i class="fas fa-sign-in-alt me-1"></i>Đăng nhập để mua sách
+                    </a>
+                <?php endif; ?>
 
-                    <?php if ($logged_in && ($post['seller_id'] == $cur_uid || $this->session->userdata('role') === 'admin')): ?>
+                <?php if ($logged_in && ($post['seller_id'] == $cur_uid || $this->session->userdata('role') === 'admin')): ?>
+                    <div class="d-flex gap-2 flex-wrap">
                         <?php if ($post['status'] === 'available'): ?>
                             <a href="<?= site_url('trade/update_status/' . $post['id']) ?>"
                                class="btn btn-outline-success py-2 fw-bold"
-                               onclick="return confirm('Đánh dấu Đã Pass?');"
-                               title="Đánh dấu Đã Pass">
-                                <i class="fas fa-check-circle me-1"></i> Đã Pass
+                               onclick="return confirm('Đánh dấu Đã Pass (hết hàng)?');">
+                                <i class="fas fa-check-circle me-1"></i>Đánh dấu Đã Pass
                             </a>
                         <?php endif; ?>
                         <a href="<?= site_url('trade/delete/' . $post['id']) ?>"
                            class="btn btn-outline-danger py-2"
                            onclick="return confirm('Xóa bài này?');"><i class="fas fa-trash"></i>
                         </a>
-                    <?php endif; ?>
+                    </div>
+                <?php endif; ?>
                 </div>
 
                 <p class="text-muted mt-3 mb-0" style="font-size:0.75rem;">
@@ -143,64 +176,14 @@
         <h5 class="fw-bold mb-3" style="color:var(--hcmue-blue);">
             <i class="fas fa-star me-2" style="color:var(--hcmue-gold);"></i>Đánh giá người bán
         </h5>
-        <?php if ($has_rated): ?>
-            <div class="alert alert-info border-0 rounded-3 mb-0" style="font-size:0.88rem;">
-                <i class="fas fa-info-circle me-2"></i>Bạn đã đánh giá người bán này rồi.
-            </div>
-        <?php elseif ($post['status'] !== 'sold'): ?>
-            <p class="text-muted mb-0" style="font-size:0.85rem;">
-                <i class="fas fa-lock me-1"></i>Chỉ có thể đánh giá sau khi sách đã được Pass.
-            </p>
-        <?php else: ?>
-            <form action="<?= site_url('rating/add/' . $post['id']) ?>" method="POST">
-                <div class="mb-3">
-                    <label class="form-label-hcmue">Số sao</label>
-                    <div class="star-picker d-flex gap-2">
-                        <?php for ($i = 1; $i <= 5; $i++): ?>
-                            <input type="radio" name="stars" id="star<?= $i ?>" value="<?= $i ?>" class="visually-hidden" required>
-                            <label for="star<?= $i ?>" class="star-pick" data-val="<?= $i ?>">
-                                <i class="far fa-star" style="font-size:1.6rem;cursor:pointer;color:#CBD5E1;transition:color 0.15s;"></i>
-                            </label>
-                        <?php endfor; ?>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label-hcmue">Nhận xét (không bắt buộc)</label>
-                    <textarea class="form-control form-control-hcmue" name="comment" rows="2"
-                              placeholder="Sách như mô tả, giao dịch thuận lợi..."></textarea>
-                </div>
-                <button type="submit" class="btn btn-gold px-4 py-2">
-                    <i class="fas fa-star me-1"></i> Gửi Đánh Giá
-                </button>
-            </form>
-            <style>
-            .star-pick i:hover, .star-pick.active i { color: var(--hcmue-gold) !important; }
-            </style>
-            <script>
-            document.querySelectorAll('.star-pick').forEach((lbl, idx, all) => {
-                lbl.addEventListener('mouseenter', () => {
-                    all.forEach((l, i) => l.querySelector('i').className = i <= idx ? 'fas fa-star' : 'far fa-star');
-                    all.forEach((l, i) => l.querySelector('i').style.color = i <= idx ? '#F5A623' : '#CBD5E1');
-                });
-                lbl.addEventListener('mouseleave', () => {
-                    const checked = document.querySelector('.star-pick input:checked');
-                    const val = checked ? parseInt(checked.value) - 1 : -1;
-                    all.forEach((l, i) => {
-                        l.querySelector('i').className = i <= val ? 'fas fa-star' : 'far fa-star';
-                        l.querySelector('i').style.color = i <= val ? '#F5A623' : '#CBD5E1';
-                    });
-                });
-                lbl.addEventListener('click', () => {
-                    all.forEach((l, i) => {
-                        l.querySelector('i').className = i <= idx ? 'fas fa-star' : 'far fa-star';
-                        l.querySelector('i').style.color = i <= idx ? '#F5A623' : '#CBD5E1';
-                    });
-                });
-            });
-            </script>
-        <?php endif; ?>
+        <div class="alert border-0 rounded-3" style="background:#F0F7FF;color:var(--hcmue-blue);font-size:0.88rem;">
+            <i class="fas fa-info-circle me-2"></i>
+            Đánh giá chỉ dành cho người đã mua và xác nhận nhận sách.
+            <a href="<?= site_url('orders?tab=buy') ?>" class="ms-1 fw-bold" style="color:var(--hcmue-blue);">Xem đơn mua của bạn →</a>
+        </div>
     </div>
     <?php endif; ?>
+
 
     <!-- ===== BÌNH LUẬN ===== -->
     <div class="card border-0 rounded-4 shadow-sm p-4" id="comments">

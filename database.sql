@@ -128,3 +128,38 @@ INSERT INTO comments (post_id, user_id, content) VALUES
 (1, 3, 'Bạn ơi sách này còn bán không? Mình cần gấp.'),
 (1, 2, 'Còn bạn nhé, nhắn tin mình để hỏi thêm nhé!'),
 (2, 2, 'Sách ở khoa nào vậy bạn?');
+
+-- ============================================================
+-- NÂNG CẤP v3.0 — Shopee-style Order System
+-- ============================================================
+
+-- Thêm số lượng vào bài đăng
+ALTER TABLE posts ADD COLUMN quantity INT NOT NULL DEFAULT 1 AFTER price;
+
+-- ============================================================
+-- BẢNG ORDERS (Đơn hàng — luồng mua bán)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS orders (
+    id            INT AUTO_INCREMENT PRIMARY KEY,
+    post_id       INT NOT NULL,
+    seller_id     INT NOT NULL,
+    buyer_id      INT NOT NULL,
+    quantity      INT NOT NULL DEFAULT 1,
+    note          TEXT COMMENT 'Ghi chú của người mua',
+    status        ENUM('pending','confirmed','completed','disputed','rejected','cancelled')
+                  NOT NULL DEFAULT 'pending',
+    reject_reason TEXT COMMENT 'Lý do từ chối / tranh chấp',
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (post_id)   REFERENCES posts(id)  ON DELETE CASCADE,
+    FOREIGN KEY (seller_id) REFERENCES users(id)  ON DELETE CASCADE,
+    FOREIGN KEY (buyer_id)  REFERENCES users(id)  ON DELETE CASCADE
+);
+
+-- Thêm order_id vào ratings (chỉ đánh giá khi có đơn completed)
+ALTER TABLE ratings ADD COLUMN order_id INT NULL AFTER post_id,
+    ADD FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE SET NULL;
+
+-- Thêm cột show_sold_history vào users (quyền hiện/ẩn lịch sử trên sàn cá nhân)
+ALTER TABLE users ADD COLUMN show_sold_history TINYINT(1) DEFAULT 1 AFTER phone_visible;
+

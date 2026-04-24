@@ -15,7 +15,7 @@ class Trade extends CI_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model(['Trade_model', 'Comment_model', 'Rating_model', 'Message_model']);
+        $this->load->model(['Trade_model', 'Comment_model', 'Rating_model', 'Message_model', 'Order_model']);
         $this->load->helper(['form', 'url']);
         $this->load->library(['session', 'upload']);
     }
@@ -45,10 +45,12 @@ class Trade extends CI_Controller {
         $data['active_cat'] = $category_id;
         $data['keyword']    = $keyword;
 
-        // Đếm tin nhắn chưa đọc (nếu đang đăng nhập)
         $data['unread_count'] = 0;
+        $data['pending_count'] = 0;
         if ($this->session->userdata('logged_in')) {
-            $data['unread_count'] = $this->Message_model->count_unread($this->session->userdata('user_id'));
+            $uid = $this->session->userdata('user_id');
+            $data['unread_count']  = $this->Message_model->count_unread($uid);
+            $data['pending_count'] = $this->Order_model->count_pending_for_seller($uid);
         }
 
         $this->load->view('partials/header', $data);
@@ -66,15 +68,15 @@ class Trade extends CI_Controller {
             show_404();
         }
 
-        // Kiểm tra đã đánh giá chưa
         $data['has_rated'] = FALSE;
         if ($this->session->userdata('logged_in')) {
-            $data['has_rated'] = $this->Rating_model->has_rated(
-                $this->session->userdata('user_id'), $id
-            );
-            $data['unread_count'] = $this->Message_model->count_unread($this->session->userdata('user_id'));
+            $uid = $this->session->userdata('user_id');
+            $data['has_rated']     = $this->Rating_model->has_rated($uid, $id);
+            $data['unread_count']  = $this->Message_model->count_unread($uid);
+            $data['pending_count'] = $this->Order_model->count_pending_for_seller($uid);
         } else {
-            $data['unread_count'] = 0;
+            $data['unread_count']  = 0;
+            $data['pending_count'] = 0;
         }
 
         $this->load->view('partials/header', $data);
@@ -131,6 +133,7 @@ class Trade extends CI_Controller {
             'title'       => $this->input->post('title', TRUE),
             'description' => $this->input->post('description', TRUE),
             'price'       => $this->input->post('price'),
+            'quantity'    => max(1, (int) $this->input->post('quantity')),
             'image_url'   => $image_url,
             // Admin đăng thì duyệt luôn, user thường thì chờ duyệt
             'status'      => ($this->session->userdata('role') === 'admin') ? 'available' : 'pending'

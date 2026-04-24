@@ -42,6 +42,13 @@
                         <span class="nav-badge"><?= $unread_count ?></span>
                     <?php endif; ?>
                 </a>
+                <!-- Đơn hàng -->
+                <a href="<?= site_url('orders') ?>" class="nav-icon-btn" title="Đơn hàng của tôi">
+                    <i class="fas fa-shopping-bag"></i>
+                    <?php if (isset($pending_count) && $pending_count > 0): ?>
+                        <span class="nav-badge"><?= $pending_count ?></span>
+                    <?php endif; ?>
+                </a>
                 <!-- Đăng bài -->
                 <button class="btn-dang-bai" data-bs-toggle="modal" data-bs-target="#createPostModal">
                     <i class="fas fa-plus"></i> Đăng Sách
@@ -61,6 +68,19 @@
                         <li>
                             <a class="dropdown-item py-2" href="<?= site_url('profile') ?>">
                                 <i class="fas fa-user-circle me-2 text-primary"></i>Trang cá nhân
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2" href="<?= site_url('orders') ?>">
+                                <i class="fas fa-shopping-bag me-2 text-success"></i>Đơn hàng của tôi
+                                <?php if (isset($pending_count) && $pending_count > 0): ?>
+                                    <span class="badge bg-warning text-dark ms-1" style="font-size:0.7rem;"><?= $pending_count ?></span>
+                                <?php endif; ?>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2" href="<?= site_url('seller/' . $this->session->userdata('user_id')) ?>">
+                                <i class="fas fa-store me-2 text-info"></i>Sàn của tôi
                             </a>
                         </li>
                         <?php if ($this->session->userdata('role') === 'admin'): ?>
@@ -107,7 +127,7 @@
                                placeholder="VD: Giáo trình C++ - Lập trình Hướng đối tượng...">
                     </div>
                     <div class="row g-3 mb-3">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label-hcmue">Danh mục môn học *</label>
                             <select class="form-select form-control-hcmue" name="category_id" required>
                                 <option value="">-- Chọn danh mục --</option>
@@ -116,13 +136,18 @@
                                 <?php endforeach; endif; ?>
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label-hcmue">Giá Pass (VNĐ) *</label>
                             <div class="input-group">
                                 <input type="number" class="form-control form-control-hcmue" name="price"
                                        required placeholder="VD: 50000" min="0">
                                 <span class="input-group-text fw-bold text-muted" style="border-radius:0 10px 10px 0; font-size:0.85rem;">đ</span>
                             </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label-hcmue">Số lượng *</label>
+                            <input type="number" class="form-control form-control-hcmue" name="quantity"
+                                   required placeholder="1" min="1" max="99" value="1">
                         </div>
                     </div>
                     <div class="mb-3">

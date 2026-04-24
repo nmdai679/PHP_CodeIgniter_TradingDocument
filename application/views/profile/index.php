@@ -11,17 +11,17 @@
 
     <!-- === Profile Header === -->
     <div class="card border-0 rounded-4 shadow-sm overflow-hidden mb-4">
-        <div style="height:90px;background:linear-gradient(135deg,var(--hcmue-blue),var(--hcmue-blue-light));"></div>
+        <div style="height:100px;background:linear-gradient(135deg,var(--hcmue-blue),var(--hcmue-blue-light));"></div>
         <div class="px-4 pb-4">
-            <div class="d-flex align-items-end gap-4" style="margin-top:-40px;">
-                <div style="width:78px;height:78px;background:var(--hcmue-gold);border-radius:50%;border:4px solid #fff;display:flex;align-items:center;justify-content:center;font-size:2rem;color:var(--hcmue-blue);font-weight:800;flex-shrink:0;">
+            <div class="d-flex align-items-end gap-4">
+                <div style="width:84px;height:84px;background:var(--hcmue-gold);border-radius:50%;border:4px solid #fff;display:flex;align-items:center;justify-content:center;font-size:2.2rem;color:var(--hcmue-blue);font-weight:800;flex-shrink:0;margin-top:-42px;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
                     <?= strtoupper(substr($user['full_name'], 0, 1)) ?>
                 </div>
-                <div class="pb-1 flex-grow-1">
-                    <h2 style="font-size:1.2rem;font-weight:800;color:#1A1A2E;margin:0;">
+                <div class="pt-3 flex-grow-1">
+                    <h2 style="font-size:1.35rem;font-weight:800;color:var(--text-dark);margin:0;letter-spacing:-0.5px;">
                         <?= htmlspecialchars($user['full_name']) ?>
                     </h2>
-                    <span class="text-muted" style="font-size:0.82rem;">@<?= $user['username'] ?></span>
+                    <span class="text-muted" style="font-size:0.85rem;">@<?= $user['username'] ?></span>
                     <?php if ($user['role'] === 'admin'): ?>
                         <span class="ms-2" style="background:var(--hcmue-gold);color:var(--hcmue-blue);font-size:0.72rem;font-weight:700;padding:2px 10px;border-radius:20px;">ADMIN</span>
                     <?php endif; ?>
