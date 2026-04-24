@@ -1,30 +1,30 @@
-<!-- Search & Filter Bar -->
+<!-- Search & Filter Bar (API-driven) -->
 <div class="search-section">
     <div class="container">
-        <form action="<?= site_url('trade') ?>" method="GET" class="d-flex gap-3 align-items-center flex-wrap">
+        <div class="d-flex gap-3 align-items-center flex-wrap">
+            <!-- Ô tìm kiếm: id="apiSearchInput" để JS lắng nghe sự kiện -->
             <div class="search-input-wrap flex-grow-1" style="min-width:200px;max-width:400px;">
                 <i class="fas fa-search search-icon"></i>
-                <input type="text" name="q" value="<?= htmlspecialchars($keyword ?? '') ?>"
+                <input type="text" id="apiSearchInput"
+                       value="<?= htmlspecialchars($keyword ?? '') ?>"
                        placeholder="Tìm sách, giáo trình...">
             </div>
-            <div class="filter-scroll flex-grow-1">
-                <a href="<?= site_url('trade') ?>"
-                   class="cat-filter-btn <?= (!$active_cat) ? 'active' : '' ?>">
+            <!-- Nút lọc danh mục: data-cat-id để JS đọc giá trị -->
+            <div class="filter-scroll flex-grow-1" id="catFilterBar">
+                <button type="button" class="cat-filter-btn active" data-cat-id="">
                     <i class="fas fa-th-large me-1"></i> Tất cả
-                </a>
+                </button>
                 <?php foreach($categories as $cat): ?>
-                    <a href="<?= site_url('trade?cat=' . $cat['id']) ?>"
-                       class="cat-filter-btn <?= ($active_cat == $cat['id']) ? 'active' : '' ?>">
+                    <button type="button" class="cat-filter-btn" data-cat-id="<?= $cat['id'] ?>">
                         <i class="<?= $cat['icon'] ?> me-1"></i> <?= $cat['category_name'] ?>
-                    </a>
+                    </button>
                 <?php endforeach; ?>
             </div>
-            <?php if($keyword || $active_cat): ?>
-                <a href="<?= site_url('trade') ?>" class="text-muted text-decoration-none" style="font-size:0.82rem;white-space:nowrap;">
-                    <i class="fas fa-times me-1"></i>Xóa lọc
-                </a>
-            <?php endif; ?>
-        </form>
+            <!-- Nút xóa lọc -->
+            <button type="button" id="clearFilterBtn" class="text-muted text-decoration-none btn btn-link p-0" style="font-size:0.82rem;white-space:nowrap;display:none;">
+                <i class="fas fa-times me-1"></i>Xóa lọc
+            </button>
+        </div>
     </div>
 </div>
 
@@ -59,153 +59,207 @@
                 Sách đang được Pass
             <?php endif; ?>
         </h2>
-        <span class="ms-3 text-muted" style="font-size:0.83rem;white-space:nowrap;">
+        <!-- id="resultCount" để JS cập nhật số lượng kết quả -->
+        <span id="resultCount" class="ms-3 text-muted" style="font-size:0.83rem;white-space:nowrap;">
             <?= count($posts) ?> bài đăng
         </span>
     </div>
 
-    <!-- Cards Grid -->
-    <?php if (empty($posts)): ?>
-        <div class="text-center py-5">
-            <i class="fas fa-box-open" style="font-size:3rem;color:#CBD5E1;"></i>
-            <p class="mt-3 text-muted" style="font-size:0.95rem;">
-                Không có bài đăng nào phù hợp.<br>
-                <?php if($this->session->userdata('logged_in')): ?>
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#createPostModal" class="link-hcmue">
-                        Đăng sách của bạn ngay!
-                    </a>
-                <?php else: ?>
-                    <a href="<?= site_url('auth') ?>" class="link-hcmue">Đăng nhập để đăng bài</a>
-                <?php endif; ?>
-            </p>
-        </div>
-    <?php else: ?>
-        <div class="row g-4">
-            <?php foreach($posts as $post): ?>
-            <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
-                <div class="card trade-card d-flex flex-column <?= $post['status'] === 'sold' ? 'card-sold' : '' ?>">
+    <!-- Cards Grid — nội dung do API trả về sẽ được đổ vào đây qua Javascript -->
+    <div id="book-list" class="row g-4"></div>
 
-                    <!-- Image -->
-                    <a href="<?= site_url('trade/detail/' . $post['id']) ?>" class="d-block card-img-link">
-                        <?php
-                            $img_path = FCPATH . $post['image_url'];
-                            $img_src  = (!empty($post['image_url']) && file_exists($img_path))
-                                        ? base_url($post['image_url'])
-                                        : base_url('assets/images/default_book.png');
-                        ?>
-                        <img src="<?= $img_src ?>"
-                             class="post-img"
-                             alt="<?= htmlspecialchars($post['title']) ?>"
-                             loading="lazy"
-                             onerror="this.onerror=null;this.src='<?= base_url('assets/images/default_book.jpg') ?>';">
-                    </a>
+    <!-- Template thông báo không có kết quả (ẩn mặc định) -->
+    <div id="empty-state" class="text-center py-5" style="display:none;">
+        <i class="fas fa-box-open" style="font-size:3rem;color:#CBD5E1;"></i>
+        <p class="mt-3 text-muted" style="font-size:0.95rem;">Không có bài đăng nào phù hợp.</p>
+    </div>
 
-                    <!-- Body -->
-                    <div class="p-3 d-flex flex-column flex-grow-1">
-                        <!-- Category + Status -->
-                        <div class="d-flex align-items-center justify-content-between mb-2 gap-1 flex-wrap">
-                            <span class="badge-cat">
-                                <i class="<?= $post['cat_icon'] ?? 'fas fa-book' ?>"></i>
-                                <?= $post['category_name'] ?>
-                            </span>
-                            <?php if ($post['status'] === 'available'): ?>
-                                <span class="status-badge-avail"><i class="fas fa-circle" style="font-size:6px;"></i> Còn sách</span>
-                            <?php else: ?>
-                                <span class="status-badge-sold"><i class="fas fa-lock" style="font-size:10px;"></i> Đã Pass</span>
-                            <?php endif; ?>
-                        </div>
-
-                        <!-- Title -->
-                        <a href="<?= site_url('trade/detail/' . $post['id']) ?>"
-                           class="text-decoration-none text-dark fw-bold mb-1"
-                           style="font-size:0.92rem;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4;">
-                            <?= htmlspecialchars($post['title']) ?>
-                        </a>
-
-                        <!-- Seller + Rating -->
-                        <div class="d-flex align-items-center gap-1 mb-2" style="font-size:0.78rem;color:#6B7280;">
-                            <i class="fas fa-user-circle" style="color:#003F8A;"></i>
-                            <span><?= htmlspecialchars($post['full_name'] ?: $post['username']) ?></span>
-                            <span class="mx-1">·</span>
-                            <?php if ($post['avg_rating'] > 0): ?>
-                                <span class="star-display">
-                                    <?php for($s=1;$s<=5;$s++): ?>
-                                        <i class="<?= $s <= round($post['avg_rating']) ? 'fas' : 'far' ?> fa-star"></i>
-                                    <?php endfor; ?>
-                                    <span style="color:#6B7280;">(<?= $post['total_ratings'] ?>)</span>
-                                </span>
-                            <?php else: ?>
-                                <span class="star-display"><span class="no-rating">Chưa có đánh giá</span></span>
-                            <?php endif; ?>
-                        </div>
-
-                        <!-- Description snippet -->
-                        <p class="text-muted mb-2 flex-grow-1"
-                           style="font-size:0.8rem;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.5;">
-                            <?= htmlspecialchars($post['description'] ?: 'Không có mô tả') ?>
-                        </p>
-
-                        <hr class="my-2" style="border-color:#F1F5F9;">
-
-                        <!-- Price + Actions -->
-                        <div class="d-flex align-items-center justify-content-between gap-1 flex-wrap">
-                            <span class="price-tag"><?= number_format($post['price'], 0, ',', '.') ?>đ</span>
-                            <div class="d-flex gap-1">
-                                <!-- SĐT nếu được bật -->
-                                <?php if ($post['phone_visible'] && $post['phone']): ?>
-                                    <a href="tel:<?= $post['phone'] ?>"
-                                       class="btn btn-sm btn-outline-success rounded-3 fw-bold"
-                                       style="font-size:0.75rem;" title="Gọi điện">
-                                        <i class="fas fa-phone"></i>
-                                    </a>
-                                <?php endif; ?>
-
-                                <?php if ($this->session->userdata('logged_in')): ?>
-                                    <?php $cur_uid = $this->session->userdata('user_id'); ?>
-                                    <?php if ($post['user_id'] != $cur_uid): ?>
-                                        <!-- Nhắn tin -->
-                                        <a href="<?= site_url('message/conversation/' . $post['user_id']) ?>"
-                                           class="btn btn-sm btn-primary-hcmue rounded-3"
-                                           style="font-size:0.75rem;" title="Nhắn tin">
-                                            <i class="fas fa-comment"></i>
-                                        </a>
-                                    <?php endif; ?>
-                                    <?php if ($post['user_id'] == $cur_uid || $this->session->userdata('role') === 'admin'): ?>
-                                        <?php if ($post['status'] === 'available'): ?>
-                                            <a href="<?= site_url('trade/update_status/' . $post['id']) ?>"
-                                               class="btn btn-sm btn-outline-success rounded-3 fw-bold"
-                                               style="font-size:0.75rem;" title="Đánh dấu Đã Pass"
-                                               onclick="return confirm('Đánh dấu sách này là Đã Pass?');">
-                                                <i class="fas fa-check"></i>
-                                            </a>
-                                        <?php endif; ?>
-                                        <a href="<?= site_url('trade/delete/' . $post['id']) ?>"
-                                           class="btn btn-sm btn-outline-danger rounded-3"
-                                           style="font-size:0.75rem;" title="Xóa"
-                                           onclick="return confirm('Bạn có chắc muốn xóa bài này?');">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
-                                    <?php endif; ?>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-
-                        <!-- Meta: time + comments -->
-                        <div class="d-flex gap-3 mt-2" style="font-size:0.74rem;color:#9CA3AF;">
-                            <span><i class="far fa-clock me-1"></i><?= date('d/m/Y', strtotime($post['created_at'])) ?></span>
-                            <span><i class="far fa-comment me-1"></i><?= $post['comment_count'] ?> bình luận</span>
-                        </div>
-                    </div>
-
-                </div>
+    <!-- Skeleton loading — hiển thị khi đang chờ API trả dữ liệu -->
+    <div id="loading-state" class="row g-4">
+        <?php for($i=0;$i<4;$i++): ?>
+        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+            <div class="card p-3" style="border-radius:12px;">
+                <div style="height:160px;background:#F1F5F9;border-radius:8px;animation:pulse 1.2s infinite;"></div>
+                <div style="height:14px;background:#F1F5F9;border-radius:4px;margin-top:12px;animation:pulse 1.2s infinite;"></div>
+                <div style="height:14px;background:#F1F5F9;border-radius:4px;margin-top:8px;width:60%;animation:pulse 1.2s infinite;"></div>
             </div>
-            <?php endforeach; ?>
         </div>
-    <?php endif; ?>
+        <?php endfor; ?>
+    </div>
 
 </div>
 
 <style>
 .link-hcmue { color:#0052B4;font-weight:600;text-decoration:none; }
 .link-hcmue:hover { text-decoration:underline; }
+
+/* Skeleton loading animation */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
+}
 </style>
+
+<script>
+(function () {
+    // =========================================================
+    // Biến trạng thái — lưu bộ lọc đang chọn
+    // =========================================================
+    let currentCat = '';    // ID danh mục đang lọc (rỗng = tất cả)
+    let searchTimer = null; // Timer cho debounce
+
+    // Lấy tham chiếu đến các phần tử HTML quan trọng
+    const searchInput  = document.getElementById('apiSearchInput');
+    const bookList     = document.getElementById('book-list');
+    const emptyState   = document.getElementById('empty-state');
+    const loadingState = document.getElementById('loading-state');
+    const resultCount  = document.getElementById('resultCount');
+    const clearBtn     = document.getElementById('clearFilterBtn');
+    const catButtons   = document.querySelectorAll('#catFilterBar .cat-filter-btn');
+
+    // URL gốc của API (dùng PHP để đảm bảo đúng domain)
+    const API_URL = '<?= site_url("api/posts/search") ?>';
+    const BASE_URL = '<?= base_url() ?>';
+    const DETAIL_URL = '<?= site_url("trade/detail/") ?>';
+    const MSG_URL = '<?= site_url("message/conversation/") ?>';
+    const DEFAULT_IMG = '<?= base_url("assets/images/default_book.jpg") ?>';
+
+    // =========================================================
+    // Hàm gọi API và render kết quả
+    // =========================================================
+    function fetchBooks() {
+        const keyword = searchInput.value.trim();
+
+        // Bước 1: Hiện skeleton, ẩn nội dung cũ
+        loadingState.style.display = 'flex';
+        bookList.style.display     = 'none';
+        emptyState.style.display   = 'none';
+
+        // Bước 2: Xây dựng URL với tham số lọc
+        const params = new URLSearchParams();
+        if (currentCat) params.append('cat', currentCat);
+        if (keyword)    params.append('q', keyword);
+
+        // Bước 3: Hiện/ẩn nút "Xóa lọc"
+        clearBtn.style.display = (currentCat || keyword) ? 'inline-block' : 'none';
+
+        // Bước 4: Gọi API bằng Fetch — đây là trái tim của tính năng này
+        fetch(API_URL + '?' + params.toString())
+            .then(function (response) { return response.json(); })
+            .then(function (result) {
+                // Ẩn skeleton sau khi nhận được dữ liệu
+                loadingState.style.display = 'none';
+
+                if (result.status === 404 || !result.data.length) {
+                    // Trường hợp không có kết quả
+                    emptyState.style.display  = 'block';
+                    bookList.style.display    = 'none';
+                    resultCount.textContent   = '0 bài đăng';
+                    return;
+                }
+
+                // Cập nhật bộ đếm kết quả
+                resultCount.textContent = result.total + ' bài đăng';
+
+                // Bước 5: Vẽ HTML từ dữ liệu JSON trả về
+                bookList.innerHTML = result.data.map(function (post) {
+                    const isSold  = post.status === 'sold';
+                    const imgSrc  = post.image_url ? BASE_URL + post.image_url : DEFAULT_IMG;
+                    const price   = Number(post.price).toLocaleString('vi-VN') + 'đ';
+                    const date    = new Date(post.created_at).toLocaleDateString('vi-VN');
+                    const rating  = parseFloat(post.avg_rating) > 0
+                        ? Array.from({length: 5}, function(_, i) {
+                              return '<i class="' + (i < Math.round(post.avg_rating) ? 'fas' : 'far') + ' fa-star"></i>';
+                          }).join('') + ' <span style="color:#6B7280">(' + post.total_ratings + ')</span>'
+                        : '<span class="no-rating">Chưa có đánh giá</span>';
+
+                    return '<div class="col-12 col-sm-6 col-lg-4 col-xl-3">' +
+                        '<div class="card trade-card d-flex flex-column ' + (isSold ? 'card-sold' : '') + '">' +
+                            '<a href="' + DETAIL_URL + post.id + '" class="d-block card-img-link">' +
+                                '<img src="' + imgSrc + '" class="post-img" alt="' + post.title + '" loading="lazy"' +
+                                     ' onerror="this.onerror=null;this.src=\'' + DEFAULT_IMG + '\'">' +
+                            '</a>' +
+                            '<div class="p-3 d-flex flex-column flex-grow-1">' +
+                                '<div class="d-flex align-items-center justify-content-between mb-2 gap-1 flex-wrap">' +
+                                    '<span class="badge-cat"><i class="' + (post.cat_icon || 'fas fa-book') + '"></i> ' + (post.category_name || '') + '</span>' +
+                                    (isSold
+                                        ? '<span class="status-badge-sold"><i class="fas fa-lock" style="font-size:10px"></i> Đã Pass</span>'
+                                        : '<span class="status-badge-avail"><i class="fas fa-circle" style="font-size:6px"></i> Còn sách</span>') +
+                                '</div>' +
+                                '<a href="' + DETAIL_URL + post.id + '" class="text-decoration-none text-dark fw-bold mb-1"' +
+                                   ' style="font-size:0.92rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4;">' +
+                                    post.title +
+                                '</a>' +
+                                '<div class="d-flex align-items-center gap-1 mb-2" style="font-size:0.78rem;color:#6B7280;">' +
+                                    '<i class="fas fa-user-circle" style="color:#003F8A;"></i>' +
+                                    '<span>' + (post.full_name || post.username) + '</span>' +
+                                    '<span class="mx-1">·</span>' +
+                                    '<span class="star-display">' + rating + '</span>' +
+                                '</div>' +
+                                '<p class="text-muted mb-2 flex-grow-1" style="font-size:0.8rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">' +
+                                    (post.description || 'Không có mô tả') +
+                                '</p>' +
+                                '<hr class="my-2" style="border-color:#F1F5F9;">' +
+                                '<div class="d-flex align-items-center justify-content-between gap-1 flex-wrap">' +
+                                    '<span class="price-tag">' + price + '</span>' +
+                                    '<a href="' + MSG_URL + post.user_id + '" class="btn btn-sm btn-primary-hcmue rounded-3" style="font-size:0.75rem;" title="Nhắn tin">' +
+                                        '<i class="fas fa-comment"></i>' +
+                                    '</a>' +
+                                '</div>' +
+                                '<div class="d-flex gap-3 mt-2" style="font-size:0.74rem;color:#9CA3AF;">' +
+                                    '<span><i class="far fa-clock me-1"></i>' + date + '</span>' +
+                                    '<span><i class="far fa-comment me-1"></i>' + post.comment_count + ' bình luận</span>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>';
+                }).join('');
+
+                bookList.style.display = '';
+            })
+            .catch(function () {
+                loadingState.style.display = 'none';
+                bookList.innerHTML = '<div class="col-12 text-center text-danger py-4">Không thể kết nối API. Vui lòng thử lại.</div>';
+                bookList.style.display = '';
+            });
+    }
+
+    // =========================================================
+    // Gắn sự kiện lọc danh mục vào các nút
+    // =========================================================
+    catButtons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            // Bỏ active tất cả, bật active nút được bấm
+            catButtons.forEach(function (b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+
+            currentCat = btn.dataset.catId; // Đọc ID danh mục từ data-cat-id
+            fetchBooks();
+        });
+    });
+
+    // =========================================================
+    // Gắn sự kiện tìm kiếm với Debounce (chờ 400ms sau khi gõ)
+    // =========================================================
+    searchInput.addEventListener('input', function () {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(fetchBooks, 400);
+    });
+
+    // =========================================================
+    // Nút "Xóa lọc"
+    // =========================================================
+    clearBtn.addEventListener('click', function () {
+        searchInput.value = '';
+        currentCat = '';
+        catButtons.forEach(function (b) { b.classList.remove('active'); });
+        catButtons[0].classList.add('active'); // Bật lại "Tất cả"
+        fetchBooks();
+    });
+
+    // =========================================================
+    // Tải danh sách ngay khi trang mở (Initial Load)
+    // =========================================================
+    fetchBooks();
+}());
+</script>
