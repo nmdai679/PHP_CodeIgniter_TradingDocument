@@ -45,3 +45,6 @@ $route['admin/delete_post/(:num)']     = 'admin/delete_post/$1';
 $route['admin/approve_post/(:num)']    = 'admin/approve_post/$1';
 $route['admin/reject_post/(:num)']     = 'admin/reject_post/$1';
 $route['admin/toggle_role/(:num)']     = 'admin/toggle_role/$1';
+
+// API
+$route['api/posts']                    = 'api/posts';
