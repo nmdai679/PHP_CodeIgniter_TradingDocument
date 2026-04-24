@@ -1,6 +1,12 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+/**
+ * @property CI_Session $session
+ * @property CI_Input $input
+ * @property Message_model $Message_model
+ * @property Auth_model $Auth_model
+ */
 class Message extends CI_Controller {
 
     public function __construct() {

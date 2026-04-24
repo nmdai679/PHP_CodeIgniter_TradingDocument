@@ -1,6 +1,13 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+/**
+ * @property CI_Session $session
+ * @property CI_DB_query_builder $db
+ * @property Trade_model $Trade_model
+ * @property Auth_model $Auth_model
+ * @property Message_model $Message_model
+ */
 class Admin extends CI_Controller {
 
     public function __construct() {

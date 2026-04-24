@@ -1,6 +1,11 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+/**
+ * @property CI_Session $session
+ * @property CI_Input $input
+ * @property Comment_model $Comment_model
+ */
 class Comment extends CI_Controller {
 
     public function __construct() {
@@ -39,7 +44,16 @@ class Comment extends CI_Controller {
             redirect('auth');
             return;
         }
-        // TODO: kiểm tra quyền sở hữu comment ở bước nâng cao
+        $comment = $this->Comment_model->get_comment_by_id($id);
+        $user_id = $this->session->userdata('user_id');
+        $role    = $this->session->userdata('role');
+
+        if (!$comment || ($comment['user_id'] != $user_id && $role !== 'admin')) {
+            $this->session->set_flashdata('error', 'Bạn không có quyền xóa bình luận này!');
+            redirect('trade/detail/' . $post_id);
+            return;
+        }
+
         $this->Comment_model->delete_comment($id);
         redirect('trade/detail/' . $post_id . '#comments');
     }

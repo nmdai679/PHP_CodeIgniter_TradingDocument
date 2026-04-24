@@ -1,6 +1,11 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+/**
+ * @property CI_Session $session
+ * @property CI_Input $input
+ * @property Auth_model $Auth_model
+ */
 class Auth extends CI_Controller {
 
     public function __construct() {
@@ -55,6 +60,14 @@ class Auth extends CI_Controller {
         $username = $this->input->post('username', TRUE);
         $password = $this->input->post('password');
         $confirm  = $this->input->post('confirm_password');
+        $full_name = $this->input->post('full_name', TRUE);
+
+        // Kiểm tra trống
+        if (empty($email) || empty($username) || empty($password) || empty($full_name)) {
+            $this->session->set_flashdata('error', 'Vui lòng nhập đầy đủ các trường bắt buộc!');
+            redirect('auth/register');
+            return;
+        }
 
         // Kiểm tra mật khẩu khớp
         if ($password !== $confirm) {

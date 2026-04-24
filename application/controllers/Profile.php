@@ -1,6 +1,14 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+/**
+ * @property CI_Session $session
+ * @property CI_Input $input
+ * @property Auth_model $Auth_model
+ * @property Trade_model $Trade_model
+ * @property Rating_model $Rating_model
+ * @property Message_model $Message_model
+ */
 class Profile extends CI_Controller {
 
     public function __construct() {

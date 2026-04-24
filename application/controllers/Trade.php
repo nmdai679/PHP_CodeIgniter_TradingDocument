@@ -5,6 +5,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @property CI_Session $session
  * @property CI_Input $input
  * @property CI_Upload $upload
+ * @property CI_DB_query_builder $db
  * @property Trade_model $Trade_model
  * @property Comment_model $Comment_model
  * @property Rating_model $Rating_model
@@ -85,6 +86,16 @@ class Trade extends CI_Controller {
     public function create() {
         $this->require_login();
         $user_id = $this->session->userdata('user_id');
+        
+        $title    = $this->input->post('title', TRUE);
+        $category = $this->input->post('category_id');
+        $price    = $this->input->post('price');
+
+        if (empty($title) || empty($category) || !isset($price)) {
+            $this->session->set_flashdata('error', 'Vui lòng nhập tiêu đề, danh mục và giá sản phẩm!');
+            redirect('trade');
+            return;
+        }
 
         // Cấu hình upload thư mục assets/uploads/
         $upload_dir = FCPATH . 'assets/uploads/';

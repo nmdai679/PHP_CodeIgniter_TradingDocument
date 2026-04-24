@@ -33,4 +33,9 @@ class Comment_model extends CI_Model {
     public function count_by_post($post_id) {
         return $this->db->where('post_id', $post_id)->count_all_results('comments');
     }
+
+    // Lấy 1 bình luận theo ID
+    public function get_comment_by_id($id) {
+        return $this->db->get_where('comments', ['id' => $id])->row_array();
+    }
 }

@@ -1,6 +1,12 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+/**
+ * @property CI_Session $session
+ * @property CI_Input $input
+ * @property Rating_model $Rating_model
+ * @property Trade_model $Trade_model
+ */
 class Rating extends CI_Controller {
 
     public function __construct() {
