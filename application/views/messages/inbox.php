@@ -12,7 +12,7 @@
     <?php else: ?>
         <div class="card border-0 rounded-4 shadow-sm overflow-hidden">
             <?php foreach($conversations as $i => $conv): ?>
-                <a href="<?= site_url('message/conversation/' . $conv['id']) ?>"
+                <a href="<?= site_url('message/conversation/' . $conv['other_user_id']) ?>"
                    class="d-flex align-items-center gap-3 p-3 text-decoration-none text-dark conv-item
                           <?= $conv['unread_count'] > 0 ? 'unread' : '' ?>"
                    style="<?= $i > 0 ? 'border-top:1px solid #F1F5F9;' : '' ?>">

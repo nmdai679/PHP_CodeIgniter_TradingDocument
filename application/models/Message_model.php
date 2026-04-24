@@ -13,7 +13,7 @@ class Message_model extends CI_Model {
         $sql = "
             SELECT 
                 m.*,
-                u.username, u.full_name, u.avatar,
+                u.id as other_user_id, u.username, u.full_name, u.avatar,
                 p.title as post_title,
                 (SELECT COUNT(*) FROM messages 
                  WHERE receiver_id = ? AND sender_id = u.id AND is_read = 0) as unread_count

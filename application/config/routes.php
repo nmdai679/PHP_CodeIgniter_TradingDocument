@@ -46,5 +46,9 @@ $route['admin/approve_post/(:num)']    = 'admin/approve_post/$1';
 $route['admin/reject_post/(:num)']     = 'admin/reject_post/$1';
 $route['admin/toggle_role/(:num)']     = 'admin/toggle_role/$1';
 
-// API
+// API — RESTful endpoints
 $route['api/posts']                    = 'api/posts';
+$route['api/posts/search']             = 'api/search';
+$route['api/posts/detail/(:num)']      = 'api/detail/$1';
+$route['api/posts/create']             = 'api/create_post_api';
+$route['api/posts/delete/(:num)']      = 'api/delete_post_api/$1';
