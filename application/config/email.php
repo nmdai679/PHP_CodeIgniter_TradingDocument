@@ -7,16 +7,18 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  | -------------------------------------------------------------------
  | Cấu hình gửi mail qua SMTP của Gmail.
  | HƯỚNG DẪN:
- | 1. smtp_user: Điền địa chỉ Gmail của bạn
- | 2. smtp_pass: Điền Mật khẩu Ứng dụng (App Password)
+ | 1. smtp_user: Điền địa chỉ Gmail của bạn (VD: taikhoan@gmail.com)
+ | 2. smtp_pass: Điền Mật khẩu Ứng dụng (App Password) gồm 16 chữ cái.
+ |    - KHÔNG phải mật khẩu đăng nhập Gmail bình thường!
+ |    - Cách tạo: Vào Tài khoản Google > Bảo mật > Xác minh 2 bước > Mật khẩu ứng dụng.
  */
 
 $config['protocol']    = 'smtp';
 $config['smtp_host']   = 'ssl://smtp.gmail.com';
 $config['smtp_port']   = 465;
-$config['smtp_user']   = 'YOUR_EMAIL_HERE@gmail.com';
-$config['smtp_pass']   = 'YOUR_APP_PASSWORD_HERE';
-$config['mailtype']    = 'html';
+$config['smtp_user']   = getenv('SMTP_USER') ?: '';
+$config['smtp_pass']   = getenv('SMTP_PASS') ?: '';
+$config['mailtype']    = 'text'; // Gửi dạng text thường
 $config['charset']     = 'utf-8';
 $config['wordwrap']    = TRUE;
 $config['newline']     = "\r\n";

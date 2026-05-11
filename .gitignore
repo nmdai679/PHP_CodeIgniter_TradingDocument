@@ -21,3 +21,8 @@ project.zip
 Thumbs.db
 .DS_Store
 *error_log
+
+# Environment config
+.env
+debug_otp.txt
+
