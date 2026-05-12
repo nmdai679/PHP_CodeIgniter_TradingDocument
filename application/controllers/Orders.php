@@ -137,6 +137,15 @@ class Orders extends CI_Controller {
             return;
         }
 
+        // Kiểm tra tồn kho thực tế trước khi cho phép xác nhận
+        $post = $this->Trade_model->get_post_by_id($order['post_id']);
+        if (!$post || $post['quantity'] < $order['quantity']) {
+            $avail = $post ? $post['quantity'] : 0;
+            $this->session->set_flashdata('error', "❌ Không đủ sách trong kho để xác nhận! Hiện tại còn {$avail} cuốn.");
+            redirect('orders?tab=sell');
+            return;
+        }
+
         $this->Order_model->update_status($order_id, 'confirmed');
 
         // Thông báo cho người mua
@@ -187,6 +196,14 @@ class Orders extends CI_Controller {
 
         if (!$order || $order['buyer_id'] != $buyer_id || $order['status'] !== 'confirmed') {
             $this->session->set_flashdata('error', 'Không thể xác nhận đơn hàng này!');
+            redirect('orders?tab=buy');
+            return;
+        }
+
+        // Một lớp kiểm tra cuối cùng trước khi trừ số lượng
+        $post = $this->Trade_model->get_post_by_id($order['post_id']);
+        if (!$post || $post['quantity'] < $order['quantity']) {
+            $this->session->set_flashdata('error', '❌ Rất tiếc, mặt hàng này hiện tại đã hết hàng hoặc đã được bán cho người khác trước!');
             redirect('orders?tab=buy');
             return;
         }

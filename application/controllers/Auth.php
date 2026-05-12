@@ -323,4 +323,159 @@ class Auth extends CI_Controller {
 
         redirect('auth/verify_otp');
     }
+
+    // ==========================================
+    // KHÔI PHỤC MẬT KHẨU
+    // ==========================================
+
+    public function forgot_password() {
+        if ($this->session->userdata('logged_in')) {
+            redirect('home');
+            return;
+        }
+        $this->load->view('auth/forgot_password');
+    }
+
+    public function forgot_password_post() {
+        $email = $this->input->post('email', TRUE);
+
+        $user = $this->Auth_model->get_user_by_email($email);
+        if (!$user) {
+            $this->session->set_flashdata('error', 'Không tìm thấy tài khoản với email này!');
+            redirect('auth/forgot_password');
+            return;
+        }
+
+        // Tạo OTP
+        $otp = rand(100000, 999999);
+        $forgot_data = [
+            'email' => $email,
+            'otp'   => $otp,
+            'otp_expires' => time() + 300 // 5 minutes
+        ];
+        $this->session->set_userdata('forgot_pass', $forgot_data);
+
+        // Gửi email
+        $this->load->library('email');
+        $this->email->initialize(['mailtype' => 'html']);
+        $this->email->from($this->config->item('smtp_user') ?? 'no-reply@hcmue.edu.vn', 'HCMUE Pass Sách');
+        $this->email->to($email);
+        $this->email->subject('[HCMUE Pass Sách] Mã khôi phục mật khẩu');
+
+        $html_body = "
+        <!DOCTYPE html>
+        <html lang='vi'>
+        <head><meta charset='UTF-8'></head>
+        <body style='margin:0;padding:0;background:#f0f4f8;font-family:Inter,Arial,sans-serif;'>
+            <table width='100%' cellpadding='0' cellspacing='0' style='padding:40px 20px;'>
+                <tr><td align='center'>
+                    <table width='560' cellpadding='0' cellspacing='0' style='background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);max-width:560px;width:100%;'>
+                        <tr>
+                            <td style='background:linear-gradient(135deg,#003F8A,#0052B4);padding:32px 40px;text-align:center;'>
+                                <h1 style='margin:0;color:#ffffff;font-size:22px;font-weight:800;'>HCMUE Pass Sách</h1>
+                                <p style='margin:6px 0 0;color:rgba(255,255,255,0.75);font-size:13px;'>Khôi phục mật khẩu</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style='padding:40px 40px 32px;'>
+                                <p style='margin:0 0 16px;font-size:16px;color:#374151;'>Xin chào,</p>
+                                <p style='margin:0 0 24px;font-size:14px;color:#6B7280;line-height:1.7;'>Bạn đã yêu cầu khôi phục mật khẩu. Dưới đây là <strong>mã OTP</strong> của bạn:</p>
+                                <div style='background:#F0F5FF;border:2px dashed #003F8A;border-radius:12px;padding:28px;text-align:center;margin:0 0 28px;'>
+                                    <p style='margin:0 0 8px;font-size:12px;color:#6B7280;letter-spacing:1px;text-transform:uppercase;'>Mã xác thực</p>
+                                    <span style='font-size:42px;font-weight:800;color:#003F8A;letter-spacing:10px;'>{$otp}</span>
+                                    <p style='margin:12px 0 0;font-size:12px;color:#9CA3AF;'>⏱ Có hiệu lực trong <strong>5 phút</strong></p>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </td></tr>
+            </table>
+        </body></html>";
+
+        $this->email->message($html_body);
+
+        if ($this->email->send()) {
+            $this->session->set_flashdata('success', 'Mã OTP đã được gửi đến email của bạn.');
+            redirect('auth/verify_forgot_password');
+        } else {
+            $this->session->set_flashdata('error', 'Không thể gửi email lúc này. Vui lòng thử lại sau.');
+            redirect('auth/forgot_password');
+        }
+    }
+
+    public function verify_forgot_password() {
+        if (!$this->session->userdata('forgot_pass')) {
+            redirect('auth/forgot_password');
+            return;
+        }
+        $this->load->view('auth/verify_forgot_password');
+    }
+
+    public function verify_forgot_password_post() {
+        $forgot_data = $this->session->userdata('forgot_pass');
+        if (!$forgot_data) {
+            redirect('auth/forgot_password');
+            return;
+        }
+
+        $input_otp = $this->input->post('otp', TRUE);
+
+        if (time() > $forgot_data['otp_expires']) {
+            $this->session->set_flashdata('error', 'Mã OTP đã hết hạn! Vui lòng yêu cầu lại.');
+            redirect('auth/forgot_password');
+            return;
+        }
+
+        if ($input_otp != $forgot_data['otp']) {
+            $this->session->set_flashdata('error', 'Mã OTP không chính xác!');
+            redirect('auth/verify_forgot_password');
+            return;
+        }
+
+        // OTP đúng, cho phép reset password
+        $this->session->set_userdata('reset_pass_allowed', $forgot_data['email']);
+        redirect('auth/reset_password');
+    }
+
+    public function reset_password() {
+        if (!$this->session->userdata('reset_pass_allowed')) {
+            redirect('auth/login');
+            return;
+        }
+        $this->load->view('auth/reset_password');
+    }
+
+    public function reset_password_post() {
+        $email = $this->session->userdata('reset_pass_allowed');
+        if (!$email) {
+            redirect('auth/login');
+            return;
+        }
+
+        $password = $this->input->post('password');
+        $confirm  = $this->input->post('confirm_password');
+
+        if ($password !== $confirm) {
+            $this->session->set_flashdata('error', 'Mật khẩu xác nhận không khớp!');
+            redirect('auth/reset_password');
+            return;
+        }
+
+        $user = $this->Auth_model->get_user_by_email($email);
+        if ($user) {
+            $this->Auth_model->update_user($user['id'], [
+                'password' => password_hash($password, PASSWORD_DEFAULT)
+            ]);
+            
+            // Xóa session
+            $this->session->unset_userdata('forgot_pass');
+            $this->session->unset_userdata('reset_pass_allowed');
+
+            $this->session->set_flashdata('success', 'Mật khẩu đã được thay đổi thành công! Vui lòng đăng nhập.');
+            redirect('auth/login');
+        } else {
+            $this->session->set_flashdata('error', 'Đã xảy ra lỗi, vui lòng thử lại.');
+            redirect('auth/forgot_password');
+        }
+    }
 }

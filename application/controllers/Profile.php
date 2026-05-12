@@ -138,4 +138,37 @@ class Profile extends CI_Controller {
         $this->session->set_flashdata('success', 'Tài khoản của bạn đã được xóa vĩnh viễn.');
         redirect('auth');
     }
+
+    // Cập nhật mật khẩu
+    public function change_password() {
+        $this->require_login();
+        $user_id = $this->session->userdata('user_id');
+        
+        $old_password = $this->input->post('old_password');
+        $new_password = $this->input->post('new_password');
+        $confirm_password = $this->input->post('confirm_password');
+
+        if (empty($old_password) || empty($new_password) || empty($confirm_password)) {
+            $this->session->set_flashdata('error', 'Vui lòng nhập đầy đủ các trường mật khẩu!');
+            redirect('profile');
+            return;
+        }
+
+        if ($new_password !== $confirm_password) {
+            $this->session->set_flashdata('error', 'Mật khẩu xác nhận không khớp!');
+            redirect('profile');
+            return;
+        }
+
+        $user = $this->Auth_model->get_user_by_id($user_id);
+        if (!password_verify($old_password, $user['password'])) {
+            $this->session->set_flashdata('error', 'Mật khẩu cũ không chính xác!');
+            redirect('profile');
+            return;
+        }
+
+        $this->Auth_model->update_user($user_id, ['password' => password_hash($new_password, PASSWORD_DEFAULT)]);
+        $this->session->set_flashdata('success', '✅ Đã thay đổi mật khẩu thành công!');
+        redirect('profile');
+    }
 }

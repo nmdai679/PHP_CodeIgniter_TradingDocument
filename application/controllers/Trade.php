@@ -15,7 +15,7 @@ class Trade extends CI_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model(['Trade_model', 'Comment_model', 'Rating_model', 'Message_model', 'Order_model']);
+        $this->load->model(['Trade_model', 'Comment_model', 'Rating_model', 'Message_model', 'Order_model', 'Setting_model']);
         $this->load->helper(['form', 'url']);
         $this->load->library(['session', 'upload']);
     }
@@ -127,6 +127,9 @@ class Trade extends CI_Controller {
             }
         }
 
+        $auto_approve = ($this->Setting_model->get('auto_approve_new') === '1');
+        $final_status = ($this->session->userdata('role') === 'admin' || $auto_approve) ? 'available' : 'pending';
+
         $post_data = [
             'user_id'     => $user_id,
             'category_id' => $this->input->post('category_id'),
@@ -135,13 +138,12 @@ class Trade extends CI_Controller {
             'price'       => $this->input->post('price'),
             'quantity'    => max(1, (int) $this->input->post('quantity')),
             'image_url'   => $image_url,
-            // Admin đăng thì duyệt luôn, user thường thì chờ duyệt
-            'status'      => ($this->session->userdata('role') === 'admin') ? 'available' : 'pending'
+            'status'      => $final_status
         ];
 
         $this->Trade_model->insert_post($post_data);
 
-        if ($this->session->userdata('role') === 'admin') {
+        if ($final_status === 'available') {
             $this->session->set_flashdata('success', '✅ Đăng bài thành công!');
         } else {
             $this->session->set_flashdata('success', '✅ Đăng bài thành công! Bài của bạn đang chờ Admin duyệt.');
@@ -196,7 +198,9 @@ class Trade extends CI_Controller {
         $this->Trade_model->delete_post($id);
         $this->session->set_flashdata('success', 'Đã xóa bài đăng!');
         redirect('trade');
-        // Form chỉnh sửa bài đăng
+    }
+
+    // Form chỉnh sửa bài đăng
     public function edit($id) {
         $this->require_login();
         $post = $this->Trade_model->get_post_by_id($id);
@@ -259,10 +263,12 @@ class Trade extends CI_Controller {
         ];
 
         // Check and re-approve reset logic
-        // If user changes main things like title/description/category -> force pending review.
-        // Unless admin is editing.
-        if ($role !== 'admin') {
+        $auto_approve_edit = ($this->Setting_model->get('auto_approve_edit') === '1');
+        $was_pending = false;
+
+        if ($role !== 'admin' && !$auto_approve_edit) {
             $update_data['status'] = 'pending';
+            $was_pending = true;
         }
 
         // Xử lý upload ảnh mới
@@ -286,7 +292,7 @@ class Trade extends CI_Controller {
 
         $this->Trade_model->update_post($id, $update_data);
 
-        $msg = ($role !== 'admin') 
+        $msg = ($was_pending) 
                ? '✅ Cập nhật thành công! Bài đăng đang chờ duyệt lại do thay đổi nội dung.'
                : '✅ Cập nhật bài đăng thành công!';
         

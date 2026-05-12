@@ -284,6 +284,9 @@
                         <i class="fas fa-eye" id="pwd-icon"></i>
                     </button>
                 </div>
+                <div class="text-end mt-2">
+                    <a href="<?= site_url('auth/forgot_password') ?>" style="font-size: 0.82rem; text-decoration: none; font-weight: 600;">Quên mật khẩu?</a>
+                </div>
             </div>
             <button type="submit" class="btn-login" id="loginBtn">
                 <i class="fas fa-sign-in-alt"></i>Đăng Nhập

@@ -12,7 +12,7 @@ class Admin extends CI_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->load->model(['Trade_model', 'Auth_model', 'Message_model']);
+        $this->load->model(['Trade_model', 'Auth_model', 'Message_model', 'Setting_model']);
         $this->load->library('session');
         $this->load->helper(['url']);
     }
@@ -38,10 +38,27 @@ class Admin extends CI_Controller {
         $data['recent_posts']  = $this->Trade_model->get_all_posts();
         $data['pending_posts'] = $this->Trade_model->get_pending_posts();
         $data['unread_count']  = $this->Message_model->count_unread($user_id);
+        
+        // Lấy các cài đặt hiện tại
+        $data['app_settings'] = $this->Setting_model->get_all();
 
         $this->load->view('partials/header', $data);
         $this->load->view('admin/dashboard', $data);
         $this->load->view('partials/footer');
+    }
+
+    // Cập nhật cấu hình hệ thống
+    public function update_settings() {
+        $this->require_admin();
+        
+        $auto_approve_new = $this->input->post('auto_approve_new') ? '1' : '0';
+        $auto_approve_edit = $this->input->post('auto_approve_edit') ? '1' : '0';
+        
+        $this->Setting_model->set('auto_approve_new', $auto_approve_new);
+        $this->Setting_model->set('auto_approve_edit', $auto_approve_edit);
+        
+        $this->session->set_flashdata('success', '✅ Đã cập nhật cấu hình hệ thống thành công!');
+        redirect('admin');
     }
 
     // Quản lý người dùng

@@ -90,13 +90,40 @@
                 <!-- Toggle ẩn/hiện SĐT -->
                 <label class="form-label text-muted small fw-bold mb-1">Chế độ hiển thị SĐT</label>
                 <a href="<?= site_url('profile/toggle_phone') ?>"
-                   class="btn w-100 py-2 fw-bold"
+                   class="btn w-100 py-2 fw-bold mb-4"
                    style="font-size:0.8rem;border-radius:10px;
                           background:<?= $user['phone_visible'] ? '#D1FAE5' : '#F3F4F6' ?>;
                           color:<?= $user['phone_visible'] ? '#065F46' : '#6B7280' ?>;border:none;">
                     <i class="fas fa-<?= $user['phone_visible'] ? 'eye' : 'eye-slash' ?> me-2"></i>
                     <?= $user['phone_visible'] ? 'Công khai' : 'Riêng tư' ?>
                 </a>
+
+                <hr class="my-3" style="border-color:#F1F5F9;">
+
+                <!-- Đổi mật khẩu -->
+                <h6 class="fw-bold mb-3" style="color:var(--primary); font-size: 0.95rem;">
+                    <i class="fas fa-lock me-2"></i>Đổi mật khẩu
+                </h6>
+                <form action="<?= site_url('profile/change_password') ?>" method="POST">
+                    <div class="mb-2">
+                        <input type="password" class="form-control form-control-sm" name="old_password" 
+                               placeholder="Mật khẩu cũ" required 
+                               style="border-radius:8px; border:1.5px solid #E5E9F2; background:#f8fafc;">
+                    </div>
+                    <div class="mb-2">
+                        <input type="password" class="form-control form-control-sm" name="new_password" 
+                               placeholder="Mật khẩu mới" required 
+                               style="border-radius:8px; border:1.5px solid #E5E9F2; background:#f8fafc;">
+                    </div>
+                    <div class="mb-3">
+                        <input type="password" class="form-control form-control-sm" name="confirm_password" 
+                               placeholder="Xác nhận mật khẩu mới" required 
+                               style="border-radius:8px; border:1.5px solid #E5E9F2; background:#f8fafc;">
+                    </div>
+                    <button type="submit" class="btn btn-outline-secondary w-100 btn-sm py-2" style="border-radius:8px;font-weight:600;">
+                        Cập nhật mật khẩu
+                    </button>
+                </form>
             </div>
         </div>
 
