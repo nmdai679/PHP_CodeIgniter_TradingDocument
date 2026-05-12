@@ -47,7 +47,7 @@ class Seller_model extends CI_Model {
     // Lấy đánh giá của seller kèm tên sách (tab Đánh giá)
     public function get_ratings($seller_id) {
         $this->db->select('ratings.*, 
-            buyer.full_name  as buyer_name,  buyer.username  as buyer_username,
+            buyer.full_name  as buyer_name,  buyer.username  as buyer_username, buyer.avatar as buyer_avatar,
             posts.title      as post_title');
         $this->db->from('ratings');
         $this->db->join('users buyer', 'buyer.id  = ratings.reviewer_id', 'left');

@@ -14,8 +14,12 @@
         <div style="height:120px;background:linear-gradient(145deg, #1E3A8A 0%, #1D4ED8 60%, #3B82F6 100%);"></div>
         <div class="px-4 pb-4">
             <div class="d-flex align-items-end gap-4">
-                <div style="width:90px;height:90px;background:var(--bg-card);border-radius:50%;border:4px solid #fff;display:flex;align-items:center;justify-content:center;font-size:2.4rem;color:var(--primary);font-weight:800;flex-shrink:0;margin-top:-45px;box-shadow:var(--shadow-md);">
-                    <?= strtoupper(substr($user['full_name'], 0, 1)) ?>
+                <div style="width:90px;height:90px;background:var(--bg-card);border-radius:50%;border:4px solid #fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:-45px;box-shadow:var(--shadow-md);overflow:hidden;">
+                    <?php if(!empty($user['avatar']) && file_exists(FCPATH . $user['avatar'])): ?>
+                        <img src="<?= base_url($user['avatar']) ?>" alt="Avatar" style="width:100%;height:100%;object-fit:cover;">
+                    <?php else: ?>
+                        <div style="font-size:2.4rem;color:var(--primary);font-weight:800;"><?= strtoupper(substr($user['full_name'], 0, 1)) ?></div>
+                    <?php endif; ?>
                 </div>
                 <div class="pt-3 flex-grow-1">
                     <h2 style="font-size:1.45rem;font-weight:800;color:var(--text-dark);margin:0;letter-spacing:-0.5px;">
@@ -44,37 +48,54 @@
     </div>
 
     <div class="row g-4">
-        <!-- === Cài đặt SĐT === -->
+        <!-- === Cài đặt Cá Nhân === -->
         <div class="col-md-4">
             <div class="card border-0 rounded-4 shadow-sm p-4 h-100">
                 <h6 class="fw-bold mb-3" style="color:var(--primary);">
-                    <i class="fas fa-phone me-2"></i>Số điện thoại
+                    <i class="fas fa-user-edit me-2"></i>Thông tin cá nhân
                 </h6>
-                <p class="text-muted mb-3" style="font-size:0.82rem;">
-                    Cho phép người mua xem số SĐT của bạn trực tiếp trên bài đăng.
-                </p>
-
-                <!-- Cập nhật SĐT -->
-                <form action="<?= site_url('profile/update_phone') ?>" method="POST" class="mb-3">
-                    <div class="input-group input-group-sm">
-                        <input type="tel" class="form-control" name="phone"
-                               value="<?= htmlspecialchars($user['phone'] ?? '') ?>"
-                               placeholder="0912345678"
-                               style="border-radius:8px 0 0 8px;border:1.5px solid #E5E9F2;">
-                        <button type="submit" class="btn btn-primary-hcmue px-3" style="border-radius:0 8px 8px 0;font-size:0.8rem;">
-                            Lưu
-                        </button>
+                
+                <form action="<?= site_url('profile/update_info') ?>" method="POST" enctype="multipart/form-data">
+                    <!-- Sửa tên -->
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold mb-1">Họ và Tên</label>
+                        <input type="text" class="form-control form-control-sm" name="full_name" 
+                               value="<?= htmlspecialchars($user['full_name']) ?>" required 
+                               style="border-radius:8px; border:1.5px solid #E5E9F2;">
                     </div>
+                    
+                    <!-- Đổi avatar -->
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold mb-1">Thay ảnh đại diện</label>
+                        <input type="file" class="form-control form-control-sm" name="avatar" accept="image/*" 
+                               style="border-radius:8px; border:1.5px solid #E5E9F2; font-size: 0.75rem;">
+                    </div>
+
+                    <!-- Cập nhật SĐT -->
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold mb-1">Số điện thoại</label>
+                        <input type="tel" class="form-control form-control-sm" name="phone" 
+                               value="<?= htmlspecialchars($user['phone'] ?? '') ?>" 
+                               placeholder="0912345678"
+                               style="border-radius:8px; border:1.5px solid #E5E9F2;">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary-hcmue w-100 btn-sm py-2 mb-3" style="border-radius:8px;font-weight:600;">
+                        <i class="fas fa-save me-1"></i> Lưu thay đổi
+                    </button>
                 </form>
 
-                <!-- Toggle ẩn/hiện -->
+                <hr class="my-3" style="border-color:#F1F5F9;">
+
+                <!-- Toggle ẩn/hiện SĐT -->
+                <label class="form-label text-muted small fw-bold mb-1">Chế độ hiển thị SĐT</label>
                 <a href="<?= site_url('profile/toggle_phone') ?>"
                    class="btn w-100 py-2 fw-bold"
-                   style="font-size:0.85rem;border-radius:10px;
+                   style="font-size:0.8rem;border-radius:10px;
                           background:<?= $user['phone_visible'] ? '#D1FAE5' : '#F3F4F6' ?>;
                           color:<?= $user['phone_visible'] ? '#065F46' : '#6B7280' ?>;border:none;">
                     <i class="fas fa-<?= $user['phone_visible'] ? 'eye' : 'eye-slash' ?> me-2"></i>
-                    <?= $user['phone_visible'] ? 'Đang hiển thị — Click để Ẩn' : 'Đang ẩn — Click để Hiện' ?>
+                    <?= $user['phone_visible'] ? 'Công khai' : 'Riêng tư' ?>
                 </a>
             </div>
         </div>
@@ -83,7 +104,7 @@
         <div class="col-md-8">
             <div class="card border-0 rounded-4 shadow-sm p-4 h-100">
                 <h6 class="fw-bold mb-3" style="color:var(--primary);">
-                    <i class="fas fa-star me-2" style="color:var(--hcmue-gold);"></i>Đánh giá từ người mua
+                    <i class="fas fa-star me-2" style="color:var(--accent);"></i>Đánh giá từ người mua
                 </h6>
                 <?php if (empty($my_ratings)): ?>
                     <p class="text-muted mb-0" style="font-size:0.85rem;">Bạn chưa nhận được đánh giá nào.</p>
@@ -91,8 +112,12 @@
                     <div class="d-flex flex-column gap-3" style="max-height:220px;overflow-y:auto;">
                         <?php foreach($my_ratings as $r): ?>
                             <div class="d-flex gap-3">
-                                <div style="width:34px;height:34px;background:#E8F0FD;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--primary);font-weight:700;font-size:0.8rem;flex-shrink:0;">
-                                    <?= strtoupper(substr($r['full_name'] ?: $r['username'], 0, 1)) ?>
+                                <div style="width:34px;height:34px;background:#E8F0FD;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--primary);font-weight:700;font-size:0.8rem;flex-shrink:0; overflow:hidden;">
+                                    <?php if (!empty($r['avatar']) && file_exists(FCPATH . $r['avatar'])): ?>
+                                        <img src="<?= base_url($r['avatar']) ?>" alt="Avt" style="width:100%;height:100%;object-fit:cover;">
+                                    <?php else: ?>
+                                        <?= strtoupper(substr($r['full_name'] ?: $r['username'], 0, 1)) ?>
+                                    <?php endif; ?>
                                 </div>
                                 <div>
                                     <div class="d-flex align-items-center gap-2 mb-1">

@@ -79,8 +79,14 @@
                 <!-- User Chip -->
                 <div class="dropdown">
                     <a href="javascript:void(0)" class="nav-user-chip" data-bs-toggle="dropdown">
-                        <div class="nav-user-avatar">
-                            <?= strtoupper(substr($this->session->userdata('full_name'), 0, 1)) ?>
+                        <div class="nav-user-avatar" style="overflow:hidden; display:flex; align-items:center; justify-content:center;">
+                            <?php 
+                            $ses_avt = $this->session->userdata('avatar');
+                            if (!empty($ses_avt) && file_exists(FCPATH . $ses_avt)): ?>
+                                <img src="<?= base_url($ses_avt) ?>" alt="Avatar" style="width:100%; height:100%; object-fit:cover;">
+                            <?php else: ?>
+                                <?= strtoupper(substr($this->session->userdata('full_name'), 0, 1)) ?>
+                            <?php endif; ?>
                         </div>
                         <span style="font-size:0.82rem; font-weight:600;">
                             <?= $this->session->userdata('full_name') ?>

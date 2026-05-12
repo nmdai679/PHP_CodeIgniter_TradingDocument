@@ -48,6 +48,7 @@ class Auth extends CI_Controller {
                 'user_id'   => $user['id'],
                 'username'  => $user['username'],
                 'full_name' => $user['full_name'],
+                'avatar'    => $user['avatar'],
                 'role'      => $user['role'],
                 'logged_in' => TRUE
             ];

@@ -43,7 +43,7 @@ class Rating_model extends CI_Model {
 
     // Lấy danh sách đánh giá của người bán (kèm thông tin người đánh giá)
     public function get_ratings_for_seller($seller_id) {
-        $this->db->select('ratings.*, users.username, users.full_name, posts.title as post_title');
+        $this->db->select('ratings.*, users.username, users.full_name, users.avatar, posts.title as post_title');
         $this->db->from('ratings');
         $this->db->join('users', 'users.id = ratings.reviewer_id', 'left');
         $this->db->join('posts', 'posts.id = ratings.post_id', 'left');

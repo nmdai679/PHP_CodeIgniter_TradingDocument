@@ -14,7 +14,7 @@ class Profile extends CI_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model(['Auth_model', 'Trade_model', 'Rating_model', 'Message_model']);
-        $this->load->library('session');
+        $this->load->library(['session', 'upload']);
         $this->load->helper(['url', 'form']);
     }
 
@@ -40,6 +40,59 @@ class Profile extends CI_Controller {
         $this->load->view('partials/footer');
     }
 
+    // Cập nhật thông tin cơ bản (Tên, Avatar, SĐT...)
+    public function update_info() {
+        $this->require_login();
+        $user_id = $this->session->userdata('user_id');
+        
+        $full_name = $this->input->post('full_name', TRUE);
+        $phone     = $this->input->post('phone', TRUE);
+        
+        $update_data = [];
+        if ($full_name) $update_data['full_name'] = $full_name;
+        if ($phone !== NULL) $update_data['phone'] = $phone;
+
+        // Xử lý upload avatar mới nếu có
+        if (!empty($_FILES['avatar']['name'])) {
+            $upload_dir = FCPATH . 'assets/uploads/avatars/';
+            if (!is_dir($upload_dir)) {
+                mkdir($upload_dir, 0777, TRUE);
+            }
+
+            $config['upload_path']   = $upload_dir;
+            $config['allowed_types'] = 'gif|jpg|png|jpeg|webp';
+            $config['max_size']      = 2048; // 2MB
+            $config['encrypt_name']  = TRUE;
+
+            $this->upload->initialize($config);
+
+            if ($this->upload->do_upload('avatar')) {
+                $data = $this->upload->data();
+                $update_data['avatar'] = 'assets/uploads/avatars/' . $data['file_name'];
+            } else {
+                $this->session->set_flashdata('error', 'Lỗi tải lên ảnh đại diện: ' . strip_tags($this->upload->display_errors()));
+                redirect('profile');
+                return;
+            }
+        }
+
+        if (!empty($update_data)) {
+            $this->Auth_model->update_user($user_id, $update_data);
+            
+            // Cập nhật cả session data cho full_name, avatar nếu nó vừa đổi
+            if (isset($update_data['full_name'])) {
+                $this->session->set_userdata('full_name', $update_data['full_name']);
+            }
+            if (isset($update_data['avatar'])) {
+                $this->session->set_userdata('avatar', $update_data['avatar']);
+            }
+            
+            $this->session->set_flashdata('success', 'Đã cập nhật thông tin cá nhân thành công!');
+        }
+        
+        redirect('profile');
+    }
+
     // Bật / tắt hiển thị SĐT
     public function toggle_phone() {
         $this->require_login();
@@ -53,7 +106,7 @@ class Profile extends CI_Controller {
         redirect('profile');
     }
 
-    // Cập nhật số điện thoại
+    // Cập nhật số điện thoại (Legacy support, keep if UI form still uses it, but UI should be replaced)
     public function update_phone() {
         $this->require_login();
         $user_id = $this->session->userdata('user_id');

@@ -19,10 +19,13 @@ $user_id   = $this->session->userdata('user_id');
         <div class="px-4 pb-4">
             <div class="d-flex align-items-end gap-4">
                 <div style="width:90px;height:90px;background:var(--bg-card);border-radius:50%;border:4px solid #fff;
-                            display:flex;align-items:center;justify-content:center;font-size:2.4rem;
-                            color:var(--primary);font-weight:800;flex-shrink:0;margin-top:-45px;
-                            box-shadow:var(--shadow-md);">
-                    <?= strtoupper(substr($seller['full_name'], 0, 1)) ?>
+                            display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:-45px;
+                            box-shadow:var(--shadow-md); overflow:hidden;">
+                    <?php if(!empty($seller['avatar']) && file_exists(FCPATH . $seller['avatar'])): ?>
+                        <img src="<?= base_url($seller['avatar']) ?>" alt="Avatar" style="width:100%;height:100%;object-fit:cover;">
+                    <?php else: ?>
+                        <div style="font-size:2.4rem;color:var(--primary);font-weight:800;"><?= strtoupper(substr($seller['full_name'], 0, 1)) ?></div>
+                    <?php endif; ?>
                 </div>
                 <div class="pt-3 flex-grow-1">
                     <h1 style="font-size:1.4rem;font-weight:800;color:var(--text-dark);margin:0;letter-spacing:-0.5px;">
@@ -164,8 +167,12 @@ $user_id   = $this->session->userdata('user_id');
                 <?php foreach ($ratings as $r): ?>
                 <div class="card border-0 rounded-4 shadow-sm p-3">
                     <div class="d-flex gap-3">
-                        <div style="width:40px;height:40px;background:#E8F0FD;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--primary);font-weight:700;font-size:0.9rem;flex-shrink:0;">
-                            <?= strtoupper(substr($r['buyer_name'] ?: $r['buyer_username'], 0, 1)) ?>
+                        <div style="width:40px;height:40px;background:#E8F0FD;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--primary);font-weight:700;font-size:0.9rem;flex-shrink:0; overflow:hidden;">
+                            <?php if (!empty($r['buyer_avatar']) && file_exists(FCPATH . $r['buyer_avatar'])): ?>
+                                <img src="<?= base_url($r['buyer_avatar']) ?>" alt="Avt" style="width:100%;height:100%;object-fit:cover;">
+                            <?php else: ?>
+                                <?= strtoupper(substr($r['buyer_name'] ?: $r['buyer_username'], 0, 1)) ?>
+                            <?php endif; ?>
                         </div>
                         <div class="flex-grow-1">
                             <div class="d-flex justify-content-between align-items-start flex-wrap gap-1">
