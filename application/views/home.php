@@ -1,5 +1,5 @@
 <!-- Hero Banner -->
-<div style="background:linear-gradient(135deg,#1E3A8A 0%,#2563EB 100%);padding:40px 0 36px;position:relative;overflow:hidden;">
+<div style="background:linear-gradient(145deg, #1E3A8A 0%, #1D4ED8 60%, #3B82F6 100%);padding:40px 0 36px;position:relative;overflow:hidden;">
     <div style="position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,0.04) 1px,transparent 1px);background-size:28px 28px;"></div>
     <div class="container position-relative" style="z-index:1;">
         <div class="row align-items-center">
