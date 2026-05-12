@@ -150,8 +150,8 @@ class Trade extends CI_Controller {
         redirect('trade');
     }
 
-    // Chuyển trạng thái Đã Pass — chỉ chủ bài hoặc admin
-    public function update_status($id) {
+    // Chuyển trạng thái Đã Pass / Còn sách — chỉ chủ bài hoặc admin
+    public function update_status($id, $status = 'sold') {
         $this->require_login();
         $post = $this->Trade_model->get_post_by_id($id);
 
@@ -162,13 +162,19 @@ class Trade extends CI_Controller {
 
         if ($post['user_id'] != $user_id && $role !== 'admin') {
             $this->session->set_flashdata('error', 'Bạn không có quyền thực hiện thao tác này!');
-            redirect('trade');
+            redirect('profile');
             return;
         }
 
-        $this->Trade_model->update_status($id, 'sold');
-        $this->session->set_flashdata('success', 'Đã chuyển trạng thái Đã Pass thành công!');
-        redirect('trade');
+        $allowed_status = ['sold', 'available'];
+        if (!in_array($status, $allowed_status)) {
+            $status = 'sold';
+        }
+
+        $this->Trade_model->update_status($id, $status);
+        $msg = $status === 'sold' ? 'Đã chuyển trạng thái Đã Pass thành công!' : 'Đã khôi phục trạng thái Còn sách!';
+        $this->session->set_flashdata('success', $msg);
+        redirect('profile');
     }
 
     // Xóa bài đăng — chỉ chủ bài hoặc admin

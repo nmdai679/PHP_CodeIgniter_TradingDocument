@@ -11,23 +11,23 @@
 
     <!-- === Profile Header === -->
     <div class="card border-0 rounded-4 shadow-sm overflow-hidden mb-4">
-        <div style="height:100px;background:linear-gradient(135deg,var(--hcmue-blue),var(--hcmue-blue-light));"></div>
+        <div style="height:120px;background:linear-gradient(145deg, #1E3A8A 0%, #1D4ED8 60%, #3B82F6 100%);"></div>
         <div class="px-4 pb-4">
             <div class="d-flex align-items-end gap-4">
-                <div style="width:84px;height:84px;background:var(--hcmue-gold);border-radius:50%;border:4px solid #fff;display:flex;align-items:center;justify-content:center;font-size:2.2rem;color:var(--hcmue-blue);font-weight:800;flex-shrink:0;margin-top:-42px;box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                <div style="width:90px;height:90px;background:var(--bg-card);border-radius:50%;border:4px solid #fff;display:flex;align-items:center;justify-content:center;font-size:2.4rem;color:var(--primary);font-weight:800;flex-shrink:0;margin-top:-45px;box-shadow:var(--shadow-md);">
                     <?= strtoupper(substr($user['full_name'], 0, 1)) ?>
                 </div>
                 <div class="pt-3 flex-grow-1">
-                    <h2 style="font-size:1.35rem;font-weight:800;color:var(--text-dark);margin:0;letter-spacing:-0.5px;">
+                    <h2 style="font-size:1.45rem;font-weight:800;color:var(--text-dark);margin:0;letter-spacing:-0.5px;">
                         <?= htmlspecialchars($user['full_name']) ?>
                     </h2>
                     <span class="text-muted" style="font-size:0.85rem;">@<?= $user['username'] ?></span>
                     <?php if ($user['role'] === 'admin'): ?>
-                        <span class="ms-2" style="background:var(--hcmue-gold);color:var(--hcmue-blue);font-size:0.72rem;font-weight:700;padding:2px 10px;border-radius:20px;">ADMIN</span>
+                        <span class="ms-2" style="background:var(--accent-pale);color:var(--accent-dark);font-size:0.72rem;font-weight:700;padding:2px 10px;border-radius:20px;">ADMIN</span>
                     <?php endif; ?>
                 </div>
                 <div class="text-center pb-1">
-                    <div class="fw-bold" style="font-size:1.2rem;color:var(--hcmue-blue);"><?= $avg_rating['avg'] ?: '—' ?></div>
+                    <div class="fw-bold" style="font-size:1.2rem;color:var(--primary);"><?= $avg_rating['avg'] ?: '—' ?></div>
                     <div class="star-display" style="font-size:0.85rem;">
                         <?php if ($avg_rating['avg'] > 0): ?>
                             <?php for($s=1;$s<=5;$s++): ?>
@@ -47,7 +47,7 @@
         <!-- === Cài đặt SĐT === -->
         <div class="col-md-4">
             <div class="card border-0 rounded-4 shadow-sm p-4 h-100">
-                <h6 class="fw-bold mb-3" style="color:var(--hcmue-blue);">
+                <h6 class="fw-bold mb-3" style="color:var(--primary);">
                     <i class="fas fa-phone me-2"></i>Số điện thoại
                 </h6>
                 <p class="text-muted mb-3" style="font-size:0.82rem;">
@@ -82,7 +82,7 @@
         <!-- === Đánh giá nhận được === -->
         <div class="col-md-8">
             <div class="card border-0 rounded-4 shadow-sm p-4 h-100">
-                <h6 class="fw-bold mb-3" style="color:var(--hcmue-blue);">
+                <h6 class="fw-bold mb-3" style="color:var(--primary);">
                     <i class="fas fa-star me-2" style="color:var(--hcmue-gold);"></i>Đánh giá từ người mua
                 </h6>
                 <?php if (empty($my_ratings)): ?>
@@ -91,7 +91,7 @@
                     <div class="d-flex flex-column gap-3" style="max-height:220px;overflow-y:auto;">
                         <?php foreach($my_ratings as $r): ?>
                             <div class="d-flex gap-3">
-                                <div style="width:34px;height:34px;background:#E8F0FD;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--hcmue-blue);font-weight:700;font-size:0.8rem;flex-shrink:0;">
+                                <div style="width:34px;height:34px;background:#E8F0FD;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--primary);font-weight:700;font-size:0.8rem;flex-shrink:0;">
                                     <?= strtoupper(substr($r['full_name'] ?: $r['username'], 0, 1)) ?>
                                 </div>
                                 <div>
@@ -121,7 +121,7 @@
         <div class="col-12">
             <div class="card border-0 rounded-4 shadow-sm p-4">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="fw-bold mb-0" style="color:var(--hcmue-blue);">
+                    <h6 class="fw-bold mb-0" style="color:var(--primary);">
                         <i class="fas fa-clipboard-list me-2"></i>Bài đăng của tôi (<?= count($my_posts) ?>)
                     </h6>
                     <button class="btn-dang-bai" data-bs-toggle="modal" data-bs-target="#createPostModal" style="font-size:0.8rem;padding:6px 14px;">
@@ -171,11 +171,18 @@
                                     <td>
                                         <div class="d-flex gap-1">
                                             <?php if ($p['status']==='available'): ?>
-                                                <a href="<?= site_url('trade/update_status/'.$p['id']) ?>"
+                                                <a href="<?= site_url('trade/update_status/'.$p['id'].'/sold') ?>"
                                                    class="btn btn-sm btn-outline-success rounded-2"
                                                    onclick="return confirm('Đánh dấu Đã Pass?');"
                                                    title="Đã Pass" style="font-size:0.75rem;padding:3px 8px;">
                                                     <i class="fas fa-check"></i>
+                                                </a>
+                                            <?php elseif ($p['status']==='sold'): ?>
+                                                <a href="<?= site_url('trade/update_status/'.$p['id'].'/available') ?>"
+                                                   class="btn btn-sm btn-outline-primary rounded-2"
+                                                   onclick="return confirm('Khôi phục trạng thái Còn sách để bán tiếp?');"
+                                                   title="Bán tiếp" style="font-size:0.75rem;padding:3px 8px;">
+                                                    <i class="fas fa-undo"></i>
                                                 </a>
                                             <?php endif; ?>
                                             <a href="<?= site_url('trade/delete/'.$p['id']) ?>"
@@ -241,7 +248,4 @@
     </div>
 </div>
 
-<style>
-.btn-dang-bai { background:var(--hcmue-gold);color:var(--hcmue-blue);border:none;border-radius:50px;padding:8px 18px;font-weight:700;font-size:0.88rem;display:inline-flex;align-items:center;gap:6px;transition:all 0.25s;cursor:pointer; }
-.btn-dang-bai:hover { background:var(--hcmue-gold-dark); }
-</style>
+

@@ -3,7 +3,7 @@
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-3">
         <ol class="breadcrumb" style="font-size:0.82rem;">
-            <li class="breadcrumb-item"><a href="<?= site_url('trade') ?>" class="text-decoration-none" style="color:var(--hcmue-blue);">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="<?= site_url('trade') ?>" class="text-decoration-none" style="color:var(--primary);">Trang chủ</a></li>
             <li class="breadcrumb-item active text-muted"><?= htmlspecialchars($post['title']) ?></li>
         </ol>
     </nav>
@@ -67,12 +67,12 @@
 
                 <!-- Seller Info -->
                 <div class="d-flex align-items-center gap-3 mb-3">
-                    <div style="width:44px;height:44px;background:var(--hcmue-blue);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#F5A623;font-weight:800;font-size:1.1rem;flex-shrink:0;">
+                    <div style="width:44px;height:44px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#F5A623;font-weight:800;font-size:1.1rem;flex-shrink:0;">
                         <?= strtoupper(substr($post['full_name'] ?: $post['username'], 0, 1)) ?>
                     </div>
                     <div>
                         <a href="<?= site_url('seller/' . $post['seller_id']) ?>"
-                           class="text-decoration-none" style="font-weight:700;font-size:0.9rem;color:var(--hcmue-blue);">
+                           class="text-decoration-none" style="font-weight:700;font-size:0.9rem;color:var(--primary);">
                             <?= htmlspecialchars($post['full_name'] ?: $post['username']) ?>
                             <i class="fas fa-external-link-alt ms-1" style="font-size:0.65rem;"></i>
                         </a>
@@ -88,9 +88,9 @@
                         </div>
                         <!-- SĐT -->
                         <?php if ($post['phone_visible'] && $post['phone']): ?>
-                            <div class="mt-1" style="font-size:0.82rem;color:var(--hcmue-blue);">
+                            <div class="mt-1" style="font-size:0.82rem;color:var(--primary);">
                                 <i class="fas fa-phone me-1"></i>
-                                <a href="tel:<?= $post['phone'] ?>" style="color:var(--hcmue-blue);font-weight:600;"><?= $post['phone'] ?></a>
+                                <a href="tel:<?= $post['phone'] ?>" style="color:var(--primary);font-weight:600;"><?= $post['phone'] ?></a>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -103,9 +103,9 @@
 
                 <?php if ($post['status'] === 'available' && $logged_in && $post['seller_id'] != $cur_uid): ?>
                     <!-- Form yêu cầu mua -->
-                    <form action="<?= site_url('orders/request/' . $post['id']) ?>" method="POST"
+                    <form action="<?= site_url('orders/request_buy/' . $post['id']) ?>" method="POST"
                           class="p-3 rounded-4 mb-3" style="background:#F0F7FF;border:1.5px solid #DBEAFE;">
-                        <div class="fw-bold mb-2" style="font-size:0.88rem;color:var(--hcmue-blue);"><i class="fas fa-shopping-bag me-1"></i>Yêu cầu mua sách</div>
+                        <div class="fw-bold mb-2" style="font-size:0.88rem;color:var(--primary);"><i class="fas fa-shopping-bag me-1"></i>Yêu cầu mua sách</div>
                         <div class="d-flex gap-2 mb-2">
                             <div style="flex:0 0 120px;">
                                 <label class="form-label-hcmue">Số lượng</label>
@@ -137,7 +137,7 @@
                 <?php elseif ($post['status'] === 'sold' && $logged_in && $post['seller_id'] != $cur_uid): ?>
                     <div class="alert border-0 rounded-3 mb-3" style="background:#F3F4F6;color:#6B7280;font-size:0.88rem;">
                         <i class="fas fa-lock me-2"></i>Sách này đã hết hàng.
-                        <a href="<?= site_url('seller/' . $post['seller_id']) ?>" class="ms-2" style="color:var(--hcmue-blue);font-weight:600;">Xem sàn người bán</a>
+                        <a href="<?= site_url('seller/' . $post['seller_id']) ?>" class="ms-2" style="color:var(--primary);font-weight:600;">Xem sàn người bán</a>
                     </div>
                 <?php elseif (!$logged_in): ?>
                     <a href="<?= site_url('auth') ?>" class="btn btn-primary-hcmue w-100 py-2 mb-3">
@@ -173,13 +173,13 @@
     <?php $is_own = ($logged_in && $post['seller_id'] == $cur_uid); ?>
     <?php if ($logged_in && !$is_own): ?>
     <div class="card border-0 rounded-4 shadow-sm p-4 mb-4">
-        <h5 class="fw-bold mb-3" style="color:var(--hcmue-blue);">
-            <i class="fas fa-star me-2" style="color:var(--hcmue-gold);"></i>Đánh giá người bán
+        <h5 class="fw-bold mb-3" style="color:var(--primary);">
+            <i class="fas fa-star me-2" style="color:var(--accent);"></i>Đánh giá người bán
         </h5>
-        <div class="alert border-0 rounded-3" style="background:#F0F7FF;color:var(--hcmue-blue);font-size:0.88rem;">
+        <div class="alert border-0 rounded-3" style="background:#F0F7FF;color:var(--primary);font-size:0.88rem;">
             <i class="fas fa-info-circle me-2"></i>
             Đánh giá chỉ dành cho người đã mua và xác nhận nhận sách.
-            <a href="<?= site_url('orders?tab=buy') ?>" class="ms-1 fw-bold" style="color:var(--hcmue-blue);">Xem đơn mua của bạn →</a>
+            <a href="<?= site_url('orders?tab=buy') ?>" class="ms-1 fw-bold" style="color:var(--primary);">Xem đơn mua của bạn →</a>
         </div>
     </div>
     <?php endif; ?>
@@ -187,7 +187,7 @@
 
     <!-- ===== BÌNH LUẬN ===== -->
     <div class="card border-0 rounded-4 shadow-sm p-4" id="comments">
-        <h5 class="fw-bold mb-4" style="color:var(--hcmue-blue);">
+        <h5 class="fw-bold mb-4" style="color:var(--primary);">
             <i class="fas fa-comments me-2"></i>Bình luận (<?= count($comments) ?>)
         </h5>
 
@@ -200,12 +200,12 @@
             <div class="d-flex flex-column gap-3 mb-4">
                 <?php foreach($comments as $cmt): ?>
                 <div class="d-flex gap-3">
-                    <div style="width:36px;height:36px;background:var(--hcmue-blue);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#F5A623;font-weight:700;font-size:0.85rem;flex-shrink:0;">
+                    <div style="width:36px;height:36px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#F5A623;font-weight:700;font-size:0.85rem;flex-shrink:0;">
                         <?= strtoupper(substr($cmt['full_name'] ?: $cmt['username'], 0, 1)) ?>
                     </div>
                     <div class="flex-grow-1">
                         <div style="background:#F8FAFC;border-radius:12px;padding:12px 14px;">
-                            <div class="fw-bold mb-1" style="font-size:0.82rem;color:var(--hcmue-blue);">
+                            <div class="fw-bold mb-1" style="font-size:0.82rem;color:var(--primary);">
                                 <?= htmlspecialchars($cmt['full_name'] ?: $cmt['username']) ?>
                             </div>
                             <p class="mb-0" style="font-size:0.88rem;line-height:1.6;">
@@ -225,7 +225,7 @@
         <?php if ($logged_in): ?>
             <form action="<?= site_url('comment/add/' . $post['id']) ?>" method="POST"
                   class="d-flex gap-3 align-items-start">
-                <div style="width:36px;height:36px;background:var(--hcmue-blue);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#F5A623;font-weight:700;font-size:0.85rem;flex-shrink:0;">
+                <div style="width:36px;height:36px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#F5A623;font-weight:700;font-size:0.85rem;flex-shrink:0;">
                     <?= strtoupper(substr($this->session->userdata('full_name'), 0, 1)) ?>
                 </div>
                 <div class="flex-grow-1">
@@ -239,7 +239,7 @@
         <?php else: ?>
             <div class="alert alert-light border rounded-3 mb-0" style="font-size:0.87rem;">
                 <i class="fas fa-lock me-2 text-muted"></i>
-                <a href="<?= site_url('auth') ?>" style="color:var(--hcmue-blue);font-weight:600;">Đăng nhập</a>
+                <a href="<?= site_url('auth') ?>" style="color:var(--primary);font-weight:600;">Đăng nhập</a>
                 để bình luận.
             </div>
         <?php endif; ?>
