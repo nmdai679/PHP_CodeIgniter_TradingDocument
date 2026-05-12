@@ -56,6 +56,11 @@
     --transition       : all 0.22s var(--ease);
 }
 
+/* Global Rating Star Colors */
+.star-display { color: var(--accent); display: inline-flex; gap: 2px; align-items: center; }
+.star-display i.fas { color: var(--accent); }
+.star-display i.far { color: #CBD5E1; } /* Muted ash gray for non-filled stars */
+
 /* ── BASE ── */
 *, *::before, *::after { box-sizing: border-box; }
 html, body { height: 100%; }

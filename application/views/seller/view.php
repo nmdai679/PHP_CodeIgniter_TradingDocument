@@ -5,9 +5,9 @@ $user_id   = $this->session->userdata('user_id');
 ?>
 <style>
 .seller-tab-btn { border:none;background:transparent;padding:10px 20px;font-weight:600;font-size:0.88rem;color:var(--text-muted);border-bottom:2.5px solid transparent;transition:all 0.2s;cursor:pointer; }
-.seller-tab-btn.active { color:var(--hcmue-blue);border-bottom-color:var(--hcmue-blue); }
+.seller-tab-btn.active { color:var(--primary);border-bottom-color:var(--primary); }
 .seller-stat-box { text-align:center;padding:12px 20px; }
-.seller-stat-box .num { font-size:1.5rem;font-weight:800;color:var(--hcmue-blue); }
+.seller-stat-box .num { font-size:1.5rem;font-weight:800;color:var(--primary); }
 .seller-stat-box .lbl { font-size:0.75rem;color:var(--text-muted); }
 </style>
 
@@ -15,22 +15,22 @@ $user_id   = $this->session->userdata('user_id');
 
     <!-- Seller Header Card -->
     <div class="card border-0 rounded-4 shadow-sm overflow-hidden mb-4">
-        <div style="height:90px;background:linear-gradient(135deg,var(--hcmue-blue),var(--hcmue-blue-light));"></div>
+        <div style="height:120px;background:linear-gradient(145deg, #1E3A8A 0%, #1D4ED8 60%, #3B82F6 100%);"></div>
         <div class="px-4 pb-4">
             <div class="d-flex align-items-end gap-4">
-                <div style="width:84px;height:84px;background:var(--hcmue-gold);border-radius:50%;border:4px solid #fff;
-                            display:flex;align-items:center;justify-content:center;font-size:2.2rem;
-                            color:var(--hcmue-blue);font-weight:800;flex-shrink:0;margin-top:-42px;
-                            box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+                <div style="width:90px;height:90px;background:var(--bg-card);border-radius:50%;border:4px solid #fff;
+                            display:flex;align-items:center;justify-content:center;font-size:2.4rem;
+                            color:var(--primary);font-weight:800;flex-shrink:0;margin-top:-45px;
+                            box-shadow:var(--shadow-md);">
                     <?= strtoupper(substr($seller['full_name'], 0, 1)) ?>
                 </div>
                 <div class="pt-3 flex-grow-1">
-                    <h1 style="font-size:1.3rem;font-weight:800;color:var(--text-dark);margin:0;">
+                    <h1 style="font-size:1.4rem;font-weight:800;color:var(--text-dark);margin:0;letter-spacing:-0.5px;">
                         <?= htmlspecialchars($seller['full_name']) ?>
                     </h1>
                     <span class="text-muted" style="font-size:0.85rem;">@<?= $seller['username'] ?></span>
                     <?php if ($seller['role'] === 'admin'): ?>
-                        <span class="ms-2" style="background:var(--hcmue-gold);color:var(--hcmue-blue);font-size:0.72rem;font-weight:700;padding:2px 10px;border-radius:20px;">ADMIN</span>
+                        <span class="ms-2" style="background:var(--accent-pale);color:var(--accent-dark);font-size:0.72rem;font-weight:700;padding:2px 10px;border-radius:20px;">ADMIN</span>
                     <?php endif; ?>
                 </div>
                 <!-- Actions -->
@@ -55,7 +55,7 @@ $user_id   = $this->session->userdata('user_id');
                     <div class="lbl">Đã Pass</div>
                 </div>
                 <div class="col-4 seller-stat-box">
-                    <div class="num" style="color:var(--hcmue-gold);">
+                    <div class="num" style="color:var(--accent);">
                         <?= $stats['avg_rating'] ? $stats['avg_rating'] . '★' : '—' ?>
                     </div>
                     <div class="lbl"><?= $stats['total_ratings'] ?? 0 ?> đánh giá</div>
@@ -164,7 +164,7 @@ $user_id   = $this->session->userdata('user_id');
                 <?php foreach ($ratings as $r): ?>
                 <div class="card border-0 rounded-4 shadow-sm p-3">
                     <div class="d-flex gap-3">
-                        <div style="width:40px;height:40px;background:#E8F0FD;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--hcmue-blue);font-weight:700;font-size:0.9rem;flex-shrink:0;">
+                        <div style="width:40px;height:40px;background:#E8F0FD;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--primary);font-weight:700;font-size:0.9rem;flex-shrink:0;">
                             <?= strtoupper(substr($r['buyer_name'] ?: $r['buyer_username'], 0, 1)) ?>
                         </div>
                         <div class="flex-grow-1">
@@ -177,10 +177,10 @@ $user_id   = $this->session->userdata('user_id');
                                 </span>
                             </div>
                             <!-- Tên sách đã giao dịch — tăng uy tín -->
-                            <div style="font-size:0.78rem;color:var(--hcmue-blue);margin:4px 0;">
+                            <div style="font-size:0.78rem;color:var(--primary);margin:4px 0;">
                                 <i class="fas fa-book me-1"></i>
                                 <a href="<?= site_url('trade/detail/' . $r['post_id'] ?? '#') ?>"
-                                   class="text-decoration-none" style="color:var(--hcmue-blue);">
+                                   class="text-decoration-none" style="color:var(--primary);">
                                     <?= htmlspecialchars($r['post_title'] ?? 'Sách đã bán') ?>
                                 </a>
                             </div>
