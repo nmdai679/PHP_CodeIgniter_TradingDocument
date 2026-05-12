@@ -8,12 +8,13 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --hcmue-blue:#003F8A; --hcmue-blue-mid:#0052B4; --hcmue-gold:#F5A623; }
+        :root { --primary:#1E40AF; --primary-mid:#2563EB; --primary-pale:#EFF6FF; --accent:#F59E0B; --text-dark:#0F172A; --text-muted:#64748B; --border:#E2E8F0; }
         * { box-sizing: border-box; }
         body {
-            min-height: 100vh; font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #003F8A 0%, #0052B4 50%, #1565C0 100%);
+            min-height: 100vh; font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(145deg, #1E3A8A 0%, #1D4ED8 55%, #2563EB 100%);
             display: flex; align-items: center; justify-content: center; padding: 24px;
+            -webkit-font-smoothing: antialiased;
         }
         .bg-dots {
             position: fixed; top:0;left:0;right:0;bottom:0;
@@ -28,39 +29,43 @@
             animation: slideUp 0.4s ease;
         }
         @keyframes slideUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
-        .auth-logo { width: 70px; height: 70px; margin: 0 auto 18px; display: flex; align-items: center; justify-content: center; }
-        .auth-logo img { width: 100%; height: 100%; object-fit: contain; }
-        .auth-title { font-size:1.5rem;font-weight:800;color:var(--hcmue-blue);text-align:center;margin-bottom:4px; }
-        .auth-subtitle { font-size:0.88rem;color:#6B7280;text-align:center;margin-bottom:24px; line-height:1.5; }
+        .auth-logo { margin: 0 auto 18px; text-align: center; }
+        .auth-logo a { display: block; width: 115px; height: 115px; margin: 0 auto; }
+        .auth-logo img { width: 100%; height: 100%; object-fit: contain; transition: opacity 0.2s, transform 0.2s; }
+        .auth-logo a:hover img { opacity: 0.8; transform: scale(0.96); }
+        .auth-title { font-size:1.5rem;font-weight:800;color:var(--primary);text-align:center;margin-bottom:4px;letter-spacing:-0.3px; }
+        .auth-subtitle { font-size:0.88rem;color:var(--text-muted);text-align:center;margin-bottom:24px; line-height:1.5; }
         .form-label { font-size:0.82rem;font-weight:600;color:#374151;margin-bottom:6px; }
         .form-control {
-            border:1.5px solid #E5E9F2;border-radius:10px;
+            border:1.5px solid var(--border);border-radius:10px;
             padding:11px 14px;font-size:1.8rem;transition:all 0.2s;
-            text-align: center; letter-spacing: 8px; font-weight: bold; color: var(--hcmue-blue);
+            text-align: center; letter-spacing: 8px; font-weight: bold; color: var(--primary);
         }
-        .form-control:focus { border-color:var(--hcmue-blue-mid); box-shadow:0 0 0 3px rgba(0,63,138,0.1); }
+        .form-control:focus { border-color:#93C5FD; box-shadow:0 0 0 3px rgba(37,99,235,0.12); background:#fff; }
         .btn-verify {
-            background:linear-gradient(135deg,var(--hcmue-blue),var(--hcmue-blue-mid));
+            background:linear-gradient(135deg,var(--primary),var(--primary-mid));
             color:#fff;border:none;border-radius:12px;
             padding:13px;font-weight:700;font-size:0.95rem;
-            width:100%;transition:all 0.25s;
-            box-shadow:0 4px 16px rgba(0,63,138,0.3);
+            width:100%;transition:all 0.25s;cursor:pointer;
+            box-shadow:0 4px 16px rgba(37,99,235,0.28);
         }
-        .btn-verify:hover { transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,63,138,0.4); }
-        .link-hcmue { color:var(--hcmue-blue-mid);font-weight:600;text-decoration:none; }
+        .btn-verify:hover { transform:translateY(-2px);box-shadow:0 8px 24px rgba(37,99,235,0.38); }
+        .link-hcmue { color:var(--primary-mid);font-weight:600;text-decoration:none; }
         .link-hcmue:hover { text-decoration:underline; }
         .alert { border-radius:12px;border:none; }
-        .resend-area { margin-top: 20px; text-align: center; font-size: 0.85rem; color: #6B7280; }
-        #resend-btn { background: none; border: none; color: var(--hcmue-blue-mid); font-weight: 600; cursor: pointer; padding: 0; font-size: 0.85rem; text-decoration: underline; }
-        #resend-btn:disabled { color: #9CA3AF; cursor: not-allowed; text-decoration: none; }
-        #countdown { font-weight: 700; color: var(--hcmue-blue); }
+        .resend-area { margin-top: 20px; text-align: center; font-size: 0.85rem; color: var(--text-muted); }
+        #resend-btn { background: none; border: none; color: var(--primary-mid); font-weight: 600; cursor: pointer; padding: 0; font-size: 0.85rem; text-decoration: underline; }
+        #resend-btn:disabled { color: #CBD5E1; cursor: not-allowed; text-decoration: none; }
+        #countdown { font-weight: 700; color: var(--primary); }
     </style>
 </head>
 <body>
 <div class="bg-dots"></div>
 <div class="auth-card">
     <div class="auth-logo">
-        <img src="<?= base_url('assets/images/logo_hcmue.png') ?>" alt="Logo HCMUE">
+        <a href="<?= base_url() ?>" title="Về trang chủ HCMUE Pass Sách">
+            <img src="<?= base_url('assets/images/logo_hcmue.png') ?>" alt="Logo HCMUE">
+        </a>
     </div>
     <h1 class="auth-title">Xác thực Email</h1>
     <p class="auth-subtitle">

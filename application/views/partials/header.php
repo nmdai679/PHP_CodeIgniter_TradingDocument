@@ -10,9 +10,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="<?= base_url('assets/images/logo_hcmue.png') ?>">
     <style>
-        /* Chỉ giữ lại các biến cốt lõi để đảm bảo không lỗi layout */
         :root {
-            --nav-height: 95px;
+            --nav-height: 72px;
+            --primary: #1E40AF;
+            --primary-mid: #2563EB;
+            --accent: #F59E0B;
+            --text-dark: #0F172A;
+            --text-muted: #64748B;
+            --border: #E2E8F0;
+            --bg-page: #F7F8FC;
         }
         body { padding-top: var(--nav-height); }
     </style>
@@ -55,7 +61,7 @@
                 </button>
                 <!-- User Chip -->
                 <div class="dropdown">
-                    <a href="#" class="nav-user-chip" data-bs-toggle="dropdown">
+                    <a href="javascript:void(0)" class="nav-user-chip" data-bs-toggle="dropdown">
                         <div class="nav-user-avatar">
                             <?= strtoupper(substr($this->session->userdata('full_name'), 0, 1)) ?>
                         </div>
