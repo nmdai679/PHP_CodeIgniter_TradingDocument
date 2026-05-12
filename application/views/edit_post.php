@@ -1,0 +1,87 @@
+<div class="container py-5" style="max-width: 700px;">
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold text-dark">
+                <i class="fas fa-edit me-2 text-primary"></i>Chỉnh sửa bài đăng
+            </h5>
+            <a href="<?= site_url('profile') ?>" class="btn btn-sm btn-light rounded-3 text-muted">
+                <i class="fas fa-times"></i>
+            </a>
+        </div>
+        <div class="card-body p-4">
+            <?php if ($this->session->flashdata('error')): ?>
+                <div class="alert alert-danger small mb-3"><?= $this->session->flashdata('error') ?></div>
+            <?php endif; ?>
+
+            <form action="<?= site_url('trade/update/' . $post['id']) ?>" method="POST" enctype="multipart/form-data">
+                <!-- Tiêu đề -->
+                <div class="mb-3">
+                    <label class="form-label fw-600 text-secondary small">Tiêu đề bài viết <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control rounded-3 border-light shadow-none" name="title" 
+                           style="background:#f8fafc;" value="<?= htmlspecialchars($post['title']) ?>" required>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <!-- Danh mục -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-600 text-secondary small">Danh mục <span class="text-danger">*</span></label>
+                        <select class="form-select rounded-3 border-light shadow-none" name="category_id" style="background:#f8fafc;" required>
+                            <?php foreach($categories as $cat): ?>
+                                <option value="<?= $cat['id'] ?>" <?= ($post['category_id'] == $cat['id']) ? 'selected' : '' ?>>
+                                    <?= $cat['category_name'] ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <!-- Giá -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-600 text-secondary small">Giá bán (VNĐ)</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control border-light shadow-none" name="price" 
+                                   style="background:#f8fafc;border-radius:10px 0 0 10px;" value="<?= $post['price'] ?>" min="0">
+                            <span class="input-group-text border-light bg-light small" style="border-radius:0 10px 10px 0;">đ</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <!-- Số lượng -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-600 text-secondary small">Số lượng hiện có</label>
+                        <input type="number" class="form-control rounded-3 border-light shadow-none" name="quantity" 
+                               style="background:#f8fafc;" value="<?= $post['quantity'] ?>" min="1">
+                    </div>
+                    <!-- Ảnh -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-600 text-secondary small">Thay đổi ảnh (Tùy chọn)</label>
+                        <input type="file" class="form-control form-control-sm rounded-3 border-light shadow-none" name="image" accept="image/*" style="background:#f8fafc;">
+                    </div>
+                </div>
+
+                <!-- Ảnh hiện tại -->
+                <?php if(!empty($post['image_url'])): ?>
+                <div class="mb-3">
+                    <label class="form-label fw-600 text-secondary small">Ảnh hiện tại:</label>
+                    <div style="width: 80px; height: 80px; overflow:hidden; border-radius:8px; border:1px solid #eee;">
+                        <img src="<?= base_url($post['image_url']) ?>" alt="CurImg" style="width:100%; height:100%; object-fit:cover;">
+                    </div>
+                </div>
+                <?php endif; ?>
+
+                <!-- Mô tả -->
+                <div class="mb-4">
+                    <label class="form-label fw-600 text-secondary small">Mô tả chi tiết</label>
+                    <textarea class="form-control rounded-3 border-light shadow-none" name="description" rows="4" 
+                              style="background:#f8fafc;" placeholder="Nhập mô tả về tình trạng sách, độ mới..."><?= htmlspecialchars($post['description']) ?></textarea>
+                </div>
+
+                <div class="d-flex gap-2 justify-content-end">
+                    <a href="<?= site_url('profile') ?>" class="btn btn-light px-4 rounded-3 text-secondary fw-bold">Hủy</a>
+                    <button type="submit" class="btn btn-primary-hcmue px-4 rounded-3 fw-bold shadow-sm">
+                        Lưu thay đổi
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

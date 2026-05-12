@@ -67,8 +67,12 @@
 
                 <!-- Seller Info -->
                 <div class="d-flex align-items-center gap-3 mb-3">
-                    <div style="width:44px;height:44px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#F5A623;font-weight:800;font-size:1.1rem;flex-shrink:0;">
-                        <?= strtoupper(substr($post['full_name'] ?: $post['username'], 0, 1)) ?>
+                    <div style="width:44px;height:44px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;">
+                        <?php if (!empty($post['avatar']) && file_exists(FCPATH . $post['avatar'])): ?>
+                            <img src="<?= base_url($post['avatar']) ?>" alt="Avt" style="width:100%;height:100%;object-fit:cover;">
+                        <?php else: ?>
+                            <div style="color:#F5A623;font-weight:800;font-size:1.1rem;"><?= strtoupper(substr($post['full_name'] ?: $post['username'], 0, 1)) ?></div>
+                        <?php endif; ?>
                     </div>
                     <div>
                         <a href="<?= site_url('seller/' . $post['seller_id']) ?>"
@@ -146,12 +150,16 @@
                 <?php endif; ?>
 
                 <?php if ($logged_in && ($post['seller_id'] == $cur_uid || $this->session->userdata('role') === 'admin')): ?>
-                    <div class="d-flex gap-2 flex-wrap">
+                    <div class="d-flex gap-2 flex-wrap mb-3">
+                        <a href="<?= site_url('trade/edit/' . $post['id']) ?>"
+                           class="btn btn-outline-secondary py-2 fw-bold">
+                            <i class="fas fa-edit me-1"></i>Chỉnh sửa thông tin
+                        </a>
                         <?php if ($post['status'] === 'available'): ?>
                             <a href="<?= site_url('trade/update_status/' . $post['id']) ?>"
                                class="btn btn-outline-success py-2 fw-bold"
                                onclick="return confirm('Đánh dấu Đã Pass (hết hàng)?');">
-                                <i class="fas fa-check-circle me-1"></i>Đánh dấu Đã Pass
+                                <i class="fas fa-check-circle me-1"></i>Đã Pass
                             </a>
                         <?php endif; ?>
                         <a href="<?= site_url('trade/delete/' . $post['id']) ?>"

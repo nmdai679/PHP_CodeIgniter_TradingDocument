@@ -66,7 +66,7 @@ class Trade_model extends CI_Model
     // Lấy chi tiết 1 bài đăng + bình luận
     public function get_post_detail($id)
     {
-        $this->db->select('posts.*, users.username, users.full_name, users.phone, users.phone_visible, users.id as seller_id,
+        $this->db->select('posts.*, users.username, users.full_name, users.phone, users.phone_visible, users.id as seller_id, users.avatar,
             categories.category_name,
             COALESCE(AVG(ratings.stars), 0) as avg_rating,
             COUNT(DISTINCT ratings.id) as total_ratings');
@@ -75,7 +75,7 @@ class Trade_model extends CI_Model
         $this->db->join('categories', 'categories.id = posts.category_id', 'left');
         $this->db->join('ratings', 'ratings.seller_id = posts.user_id', 'left');
         $this->db->where('posts.id', $id);
-        $this->db->group_by(['posts.id', 'posts.user_id', 'posts.category_id', 'posts.title', 'posts.description', 'posts.price', 'posts.image_url', 'posts.status', 'posts.created_at', 'users.username', 'users.full_name', 'users.phone', 'users.phone_visible', 'users.id', 'categories.category_name']);
+        $this->db->group_by(['posts.id', 'posts.user_id', 'posts.category_id', 'posts.title', 'posts.description', 'posts.price', 'posts.image_url', 'posts.status', 'posts.created_at', 'users.username', 'users.full_name', 'users.phone', 'users.phone_visible', 'users.id', 'users.avatar', 'categories.category_name']);
         return $this->db->get()->row_array();
     }
 
@@ -104,6 +104,12 @@ class Trade_model extends CI_Model
     public function update_status($id, $status) {
         $this->db->where('id', $id);
         return $this->db->update('posts', ['status' => $status]);
+    }
+
+    // Update: Chỉnh sửa thông tin bài viết generic
+    public function update_post($id, $data) {
+        $this->db->where('id', $id);
+        return $this->db->update('posts', $data);
     }
 
     // Delete: Xóa bài đăng

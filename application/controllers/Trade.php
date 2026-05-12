@@ -196,5 +196,101 @@ class Trade extends CI_Controller {
         $this->Trade_model->delete_post($id);
         $this->session->set_flashdata('success', 'Đã xóa bài đăng!');
         redirect('trade');
+        // Form chỉnh sửa bài đăng
+    public function edit($id) {
+        $this->require_login();
+        $post = $this->Trade_model->get_post_by_id($id);
+
+        if (!$post) { show_404(); }
+
+        $user_id = $this->session->userdata('user_id');
+        $role    = $this->session->userdata('role');
+
+        // Check ownership
+        if ($post['user_id'] != $user_id && $role !== 'admin') {
+            $this->session->set_flashdata('error', 'Bạn không có quyền sửa bài này!');
+            redirect('trade');
+            return;
+        }
+
+        $data['post']       = $post;
+        $data['categories'] = $this->Trade_model->get_categories();
+        $data['unread_count']  = $this->Message_model->count_unread($user_id);
+        $data['pending_count'] = $this->Order_model->count_pending_for_seller($user_id);
+
+        $this->load->view('partials/header', $data);
+        $this->load->view('edit_post', $data);
+        $this->load->view('partials/footer');
+    }
+
+    // Xử lý lưu chỉnh sửa bài đăng
+    public function update($id) {
+        $this->require_login();
+        $post = $this->Trade_model->get_post_by_id($id);
+
+        if (!$post) { show_404(); }
+
+        $user_id = $this->session->userdata('user_id');
+        $role    = $this->session->userdata('role');
+
+        if ($post['user_id'] != $user_id && $role !== 'admin') {
+            $this->session->set_flashdata('error', 'Không có quyền thực hiện!');
+            redirect('trade');
+            return;
+        }
+
+        $title       = $this->input->post('title', TRUE);
+        $category_id = $this->input->post('category_id');
+        $price       = $this->input->post('price');
+        $quantity    = max(1, (int)$this->input->post('quantity'));
+
+        if (empty($title) || empty($category_id)) {
+            $this->session->set_flashdata('error', 'Tiêu đề và Danh mục không được để trống!');
+            redirect('trade/edit/' . $id);
+            return;
+        }
+
+        $update_data = [
+            'title'       => $title,
+            'category_id' => $category_id,
+            'description' => $this->input->post('description', TRUE),
+            'price'       => $price,
+            'quantity'    => $quantity
+        ];
+
+        // Check and re-approve reset logic
+        // If user changes main things like title/description/category -> force pending review.
+        // Unless admin is editing.
+        if ($role !== 'admin') {
+            $update_data['status'] = 'pending';
+        }
+
+        // Xử lý upload ảnh mới
+        if (!empty($_FILES['image']['name'])) {
+            $upload_dir = FCPATH . 'assets/uploads/';
+            if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, TRUE);
+
+            $config['upload_path']   = $upload_dir;
+            $config['allowed_types'] = 'gif|jpg|png|jpeg|webp';
+            $config['max_size']      = 5120;
+            $config['encrypt_name']  = TRUE;
+
+            $this->upload->initialize($config);
+
+            if ($this->upload->do_upload('image')) {
+                $up_data = $this->upload->data();
+                $update_data['image_url'] = 'assets/uploads/' . $up_data['file_name'];
+                // Maybe delete old image here, optional
+            }
+        }
+
+        $this->Trade_model->update_post($id, $update_data);
+
+        $msg = ($role !== 'admin') 
+               ? '✅ Cập nhật thành công! Bài đăng đang chờ duyệt lại do thay đổi nội dung.'
+               : '✅ Cập nhật bài đăng thành công!';
+        
+        $this->session->set_flashdata('success', $msg);
+        redirect('profile');
     }
 }

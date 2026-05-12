@@ -195,6 +195,11 @@
                                     <td class="text-muted"><i class="far fa-comment me-1"></i><?= $p['comment_count'] ?></td>
                                     <td>
                                         <div class="d-flex gap-1">
+                                            <a href="<?= site_url('trade/edit/'.$p['id']) ?>"
+                                               class="btn btn-sm btn-outline-secondary rounded-2"
+                                               title="Sửa bài" style="font-size:0.75rem;padding:3px 8px;">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
                                             <?php if ($p['status']==='available'): ?>
                                                 <a href="<?= site_url('trade/update_status/'.$p['id'].'/sold') ?>"
                                                    class="btn btn-sm btn-outline-success rounded-2"
