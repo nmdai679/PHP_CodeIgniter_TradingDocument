@@ -172,4 +172,66 @@ class Admin extends CI_Controller {
         $this->session->set_flashdata('success', 'Đã bỏ chặn tài khoản người dùng!');
         redirect('admin/users');
     }
+
+    // =========================================================
+    // QUẢN LÝ DANH MỤC
+    // =========================================================
+
+    public function categories() {
+        $this->require_admin();
+        $user_id = $this->session->userdata('user_id');
+
+        $data['categories'] = $this->Trade_model->get_categories();
+        $data['unread_count'] = $this->Message_model->count_unread($user_id);
+
+        $this->load->view('partials/header', $data);
+        $this->load->view('admin/categories', $data);
+        $this->load->view('partials/footer');
+    }
+
+    public function add_category() {
+        $this->require_admin();
+        $category_name = $this->input->post('category_name', TRUE);
+        $icon = $this->input->post('icon', TRUE);
+
+        if ($category_name) {
+            $this->Trade_model->insert_category([
+                'category_name' => $category_name,
+                'icon' => $icon ?: 'fas fa-book'
+            ]);
+            $this->session->set_flashdata('success', 'Đã thêm danh mục mới thành công!');
+        }
+        redirect('admin/categories');
+    }
+
+    public function edit_category($id) {
+        $this->require_admin();
+        $category_name = $this->input->post('category_name', TRUE);
+        $icon = $this->input->post('icon', TRUE);
+
+        if ($category_name) {
+            $this->Trade_model->update_category($id, [
+                'category_name' => $category_name,
+                'icon' => $icon ?: 'fas fa-book'
+            ]);
+            $this->session->set_flashdata('success', 'Đã cập nhật danh mục thành công!');
+        }
+        redirect('admin/categories');
+    }
+
+    public function delete_category($id) {
+        $this->require_admin();
+        
+        // Kiểm tra xem danh mục này có bài đăng nào không
+        $posts_in_category = $this->db->where('category_id', $id)->count_all_results('posts');
+        if ($posts_in_category > 0) {
+            $this->session->set_flashdata('error', 'Không thể xóa danh mục đang có bài đăng. Vui lòng chuyển bài đăng sang danh mục khác trước!');
+            redirect('admin/categories');
+            return;
+        }
+
+        $this->Trade_model->delete_category($id);
+        $this->session->set_flashdata('success', 'Đã xóa danh mục thành công!');
+        redirect('admin/categories');
+    }
 }

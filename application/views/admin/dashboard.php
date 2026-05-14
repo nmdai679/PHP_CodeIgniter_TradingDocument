@@ -15,6 +15,14 @@
             <h2 style="font-size:1.2rem;font-weight:800;color:var(--hcmue-blue);margin:0;">Quản trị Admin</h2>
             <span class="text-muted" style="font-size:0.8rem;">HCMUE Pass Sách</span>
         </div>
+        <div class="ms-auto d-flex gap-2">
+            <a href="<?= site_url('admin/users') ?>" class="btn btn-primary-hcmue rounded-3 fw-bold" style="font-size:0.85rem;">
+                <i class="fas fa-users me-1"></i> Quản lý Người dùng
+            </a>
+            <a href="<?= site_url('admin/categories') ?>" class="btn btn-outline-secondary rounded-3 fw-bold" style="font-size:0.85rem;">
+                <i class="fas fa-tags me-1"></i> Quản lý Danh mục
+            </a>
+        </div>
     </div>
 
     <!-- Stat Cards -->

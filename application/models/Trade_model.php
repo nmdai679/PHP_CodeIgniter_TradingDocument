@@ -84,6 +84,28 @@ class Trade_model extends CI_Model
         return $this->db->get('categories')->result_array();
     }
 
+    public function get_category_by_id($id)
+    {
+        return $this->db->get_where('categories', ['id' => $id])->row_array();
+    }
+
+    public function insert_category($data)
+    {
+        return $this->db->insert('categories', $data);
+    }
+
+    public function update_category($id, $data)
+    {
+        $this->db->where('id', $id);
+        return $this->db->update('categories', $data);
+    }
+
+    public function delete_category($id)
+    {
+        $this->db->where('id', $id);
+        return $this->db->delete('categories');
+    }
+
     // Create: Thêm bài đăng mới
     public function insert_post($data)
     {

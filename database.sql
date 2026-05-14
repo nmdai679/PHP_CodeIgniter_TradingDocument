@@ -108,12 +108,20 @@ INSERT INTO users (full_name, username, email, password, phone, phone_visible, r
 -- Trong thực tế, dùng: password_hash('yourpassword', PASSWORD_DEFAULT)
 
 INSERT INTO categories (category_name, icon) VALUES
-('Đại cương', 'fas fa-book'),
-('Chuyên ngành IT', 'fas fa-laptop-code'),
-('Ngoại ngữ', 'fas fa-language'),
-('Tâm lý - Giáo dục', 'fas fa-brain'),
-('Kinh tế', 'fas fa-chart-line'),
-('Khoa học tự nhiên', 'fas fa-flask');
+('Các môn Đại cương', 'fas fa-book'),
+('Công nghệ Thông tin', 'fas fa-laptop-code'),
+('Tâm lý học - Giáo dục', 'fas fa-brain'),
+('Toán học & Ứng dụng', 'fas fa-calculator'),
+('Ngữ văn & Ngôn ngữ', 'fas fa-feather-alt'),
+('Sư phạm tiếng Anh', 'fas fa-language'),
+('Sư phạm tiếng Trung/Nhật/Hàn', 'fas fa-globe-asia'),
+('Khoa học Tự nhiên (Lý, Hóa, Sinh)', 'fas fa-flask'),
+('Khoa học Xã hội (Sử, Địa, GDCD)', 'fas fa-globe'),
+('Mầm non & Tiểu học', 'fas fa-child'),
+('Nghệ thuật & Thể chất', 'fas fa-palette'),
+('Giáo trình Ngoại ngữ (IELTS, TOEIC...)', 'fas fa-passport'),
+('Tài liệu ôn thi / Trắc nghiệm', 'fas fa-file-alt'),
+('Khác / Tổng hợp', 'fas fa-folder-plus');
 
 INSERT INTO posts (user_id, category_id, title, description, price, image_url, status) VALUES
 (2, 2, 'Giáo trình C++ và Lập trình Hướng đối tượng', 'Sách còn mới 90%, không ghi chú, giá rẻ cho ae khóa dưới.', 85000, 'assets/uploads/default.png', 'available'),
