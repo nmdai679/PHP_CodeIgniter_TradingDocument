@@ -163,3 +163,16 @@ ALTER TABLE ratings ADD COLUMN order_id INT NULL AFTER post_id,
 -- Thêm cột show_sold_history vào users (quyền hiện/ẩn lịch sử trên sàn cá nhân)
 ALTER TABLE users ADD COLUMN show_sold_history TINYINT(1) DEFAULT 1 AFTER phone_visible;
 
+-- Thêm cột is_banned vào users (quyền khoá tài khoản)
+ALTER TABLE users ADD COLUMN is_banned TINYINT(1) DEFAULT 0;
+
+-- ============================================================
+-- BẢNG SETTINGS (Cài đặt hệ thống cấu hình động)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS settings (
+    skey VARCHAR(50) PRIMARY KEY,
+    svalue TEXT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT IGNORE INTO settings (skey, svalue) VALUES ('auto_approve_new', '0'), ('auto_approve_edit', '0');
+
