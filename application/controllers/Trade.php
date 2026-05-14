@@ -248,6 +248,7 @@ class Trade extends CI_Controller {
 
         $data['post']       = $post;
         $data['categories'] = $this->Trade_model->get_categories();
+        $data['additional_images'] = $this->Trade_model->get_post_images($id);
         $data['unread_count']  = $this->Message_model->count_unread($user_id);
         $data['pending_count'] = $this->Order_model->count_pending_for_seller($user_id);
 
@@ -300,22 +301,47 @@ class Trade extends CI_Controller {
             $was_pending = true;
         }
 
-        // Xử lý upload ảnh mới
+        // Khởi tạo thư mục & cấu hình upload chung
+        $upload_dir = FCPATH . 'assets/uploads/';
+        if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, TRUE);
+
+        $config['upload_path']   = $upload_dir;
+        $config['allowed_types'] = 'gif|jpg|png|jpeg|webp';
+        $config['max_size']      = 5120;
+        $config['encrypt_name']  = TRUE;
+        $this->upload->initialize($config);
+
+        // 1. Xử lý upload ảnh bìa mới (nếu có)
         if (!empty($_FILES['image']['name'])) {
-            $upload_dir = FCPATH . 'assets/uploads/';
-            if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, TRUE);
-
-            $config['upload_path']   = $upload_dir;
-            $config['allowed_types'] = 'gif|jpg|png|jpeg|webp';
-            $config['max_size']      = 5120;
-            $config['encrypt_name']  = TRUE;
-
-            $this->upload->initialize($config);
-
             if ($this->upload->do_upload('image')) {
                 $up_data = $this->upload->data();
                 $update_data['image_url'] = 'assets/uploads/' . $up_data['file_name'];
-                // Maybe delete old image here, optional
+            }
+        }
+
+        // 2. Xử lý đăng THÊM ảnh chi tiết mới (Multi-Image Flow during Edit)
+        if (!empty($_FILES['additional_images']['name'][0])) {
+            $filesCount = count($_FILES['additional_images']['name']);
+            $limitCount = min($filesCount, 5);
+
+            for ($i = 0; $i < $limitCount; $i++) {
+                if (empty($_FILES['additional_images']['name'][$i])) continue;
+
+                $_FILES['tmp_file']['name']     = $_FILES['additional_images']['name'][$i];
+                $_FILES['tmp_file']['type']     = $_FILES['additional_images']['type'][$i];
+                $_FILES['tmp_file']['tmp_name'] = $_FILES['additional_images']['tmp_name'][$i];
+                $_FILES['tmp_file']['error']    = $_FILES['additional_images']['error'][$i];
+                $_FILES['tmp_file']['size']     = $_FILES['additional_images']['size'][$i];
+
+                $this->upload->initialize($config);
+
+                if ($this->upload->do_upload('tmp_file')) {
+                    $fileData = $this->upload->data();
+                    $this->db->insert('post_images', [
+                        'post_id'   => $id,
+                        'image_url' => 'assets/uploads/' . $fileData['file_name']
+                    ]);
+                }
             }
         }
 
