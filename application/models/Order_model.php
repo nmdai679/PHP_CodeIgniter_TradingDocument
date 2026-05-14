@@ -56,11 +56,10 @@ class Order_model extends CI_Model {
 
     // Kiểm tra người mua đã có đơn pending/confirmed với bài này chưa
     public function has_active_order($post_id, $buyer_id) {
-        return $this->db->get_where('orders', [
-            'post_id'  => $post_id,
-            'buyer_id' => $buyer_id,
-            'status'   => ['pending', 'confirmed']
-        ])->num_rows() > 0;
+        $this->db->where('post_id', $post_id);
+        $this->db->where('buyer_id', $buyer_id);
+        $this->db->where_in('status', ['pending', 'confirmed']);
+        return $this->db->get('orders')->num_rows() > 0;
     }
 
     // Kiểm tra đơn đã completed (để mở khóa đánh giá)
