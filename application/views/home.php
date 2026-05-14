@@ -16,26 +16,29 @@
                 $visible_cats  = array_slice($categories, 0, $limit_visible);
                 $hidden_cats   = array_slice($categories, $limit_visible);
             ?>
-            <div class="filter-scroll flex-grow-1 d-flex align-items-center" id="catFilterBar">
-                <button type="button" class="cat-filter-btn active" data-cat-id="">
-                    <i class="fas fa-th-large me-1"></i> Tất cả
-                </button>
-                <?php foreach($visible_cats as $cat): ?>
-                    <button type="button" class="cat-filter-btn" data-cat-id="<?= $cat['id'] ?>">
-                        <i class="<?= $cat['icon'] ?> me-1"></i> <?= $cat['category_name'] ?>
+            <div class="d-flex align-items-center gap-2 flex-grow-1" id="catFilterBar" style="min-width:0;">
+                <!-- Thanh trượt ngang chứa các danh mục chính -->
+                <div class="filter-scroll flex-grow-1 d-flex align-items-center">
+                    <button type="button" class="cat-filter-btn active" data-cat-id="">
+                        <i class="fas fa-th-large me-1"></i> Tất cả
                     </button>
-                <?php endforeach; ?>
+                    <?php foreach($visible_cats as $cat): ?>
+                        <button type="button" class="cat-filter-btn" data-cat-id="<?= $cat['id'] ?>">
+                            <i class="<?= $cat['icon'] ?> me-1"></i> <?= $cat['category_name'] ?>
+                        </button>
+                    <?php endforeach; ?>
+                </div>
 
-                <!-- Dropdown Cho các danh mục còn lại -->
+                <!-- Dropdown NẰM NGOÀI filter-scroll để không bị kẹt/ẩn menu -->
                 <?php if (!empty($hidden_cats)): ?>
-                    <div class="dropdown" style="flex-shrink: 0;">
+                    <div class="dropdown flex-shrink-0">
                         <button type="button" class="cat-more-btn dropdown-toggle border-0" 
-                                id="moreCatsDropdown" data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="0,10">
-                            <i class="fas fa-ellipsis-h me-1"></i> Khác
+                                id="moreCatsDropdown" data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="0,8">
+                            Khác
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 mt-2 py-2 px-1" 
                             aria-labelledby="moreCatsDropdown"
-                            style="min-width: 210px; border: 1px solid #EDF2F7 !important;">
+                            style="min-width: 210px; border: 1px solid #EDF2F7 !important; z-index: 9999;">
                             <?php foreach($hidden_cats as $cat): ?>
                                 <li>
                                     <button type="button" class="dropdown-item cat-filter-btn custom-dd-btn gap-2" 
