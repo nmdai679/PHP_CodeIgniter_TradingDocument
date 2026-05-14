@@ -1,3 +1,11 @@
+<?php
+// TỰ ĐỘNG NẠP DANH MỤC NẾU CHƯA CÓ (Sửa lỗi mất danh mục khi ở trang đơn hàng / trang khác)
+if (!isset($categories) || empty($categories)) {
+    $CI =& get_instance();
+    $CI->load->model('Trade_model');
+    $categories = $CI->Trade_model->get_categories();
+}
+?>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -184,9 +192,15 @@
                         <textarea class="form-control form-control-hcmue" name="description" rows="3"
                                   placeholder="Sách còn bao nhiêu %, có ghi chú không, tặng kèm gì..."></textarea>
                     </div>
-                    <div class="mb-4">
-                        <label class="form-label-hcmue">Hình ảnh thực tế <small class="fw-normal text-muted">(tỉ lệ 4:3 đẹp nhất)</small></label>
-                        <input type="file" class="form-control form-control-hcmue" name="image" accept="image/*">
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label-hcmue">Ảnh bìa sách (Ảnh chính) *</label>
+                            <input type="file" class="form-control form-control-hcmue" name="image" accept="image/*" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-hcmue">Ảnh chi tiết khác (Nhiều ảnh)</label>
+                            <input type="file" class="form-control form-control-hcmue" name="additional_images[]" accept="image/*" multiple>
+                        </div>
                     </div>
                     <button type="submit" class="btn btn-primary-hcmue w-100 py-3 fs-6 fw-bold">
                         <i class="fas fa-paper-plane me-2"></i>Gửi Bài Đăng

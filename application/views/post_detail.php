@@ -1,3 +1,40 @@
+<style>
+.post-thumb-item {
+    width: 65px;
+    height: 80px;
+    flex-shrink: 0;
+    cursor: pointer;
+    border: 2.5px solid transparent;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0.6;
+    background: #fff;
+}
+.post-thumb-item:hover {
+    opacity: 0.9;
+    border-color: #E2E8F0;
+}
+.post-thumb-item.active {
+    opacity: 1 !important;
+    border-color: var(--primary) !important;
+    box-shadow: 0 4px 12px rgba(30, 64, 175, 0.18);
+}
+.post-thumb-row::-webkit-scrollbar {
+    height: 5px;
+}
+.post-thumb-row::-webkit-scrollbar-thumb {
+    background-color: #CBD5E1;
+    border-radius: 10px;
+}
+.post-thumb-row::-webkit-scrollbar-track {
+    background: #F8FAFC;
+}
+.main-img-container {
+    background: #FFFFFF;
+    transition: all 0.3s ease;
+}
+</style>
 <div class="container py-4" style="max-width:900px;">
 
     <!-- Breadcrumb -->
@@ -24,20 +61,48 @@
     <!-- Post Detail Card -->
     <div class="card border-0 rounded-4 shadow-sm overflow-hidden mb-4">
         <div class="row g-0">
-            <!-- Image -->
-            <div class="col-md-5">
+            <!-- Image Column (Multi-Image support) -->
+            <div class="col-md-5 d-flex flex-column bg-light" style="border-right: 1px solid #F1F5F9;">
                 <?php
                     $img_path = FCPATH . $post['image_url'];
                     $img_src  = (!empty($post['image_url']) && file_exists($img_path))
                                 ? base_url($post['image_url'])
                                 : base_url('assets/images/default_book.jpg');
                 ?>
-                <img src="<?= $img_src ?>"
-                     class="img-fluid h-100 w-100"
-                     style="object-fit:cover;min-height:300px;max-height:420px;"
-                     alt="<?= htmlspecialchars($post['title']) ?>"
-                     loading="lazy"
-                     onerror="this.onerror=null;this.src='<?= base_url('assets/images/default_book.jpg') ?>';">
+                <!-- Khung ảnh chính -->
+                <div class="main-img-container bg-white d-flex align-items-center justify-content-center p-3" style="height:380px; overflow:hidden; position:relative;">
+                    <img id="mainImageDisplay" src="<?= $img_src ?>"
+                         class="img-fluid"
+                         style="object-fit:contain; max-height:100%; max-width:100%; border-radius:8px; transition: opacity 0.15s ease;"
+                         alt="<?= htmlspecialchars($post['title']) ?>"
+                         onerror="this.onerror=null;this.src='<?= base_url('assets/images/default_book.jpg') ?>';">
+                </div>
+                
+                <!-- Hàng ảnh phụ (Thumbnails) -->
+                <?php if(!empty($additional_images)): ?>
+                <div class="p-3 bg-white border-top">
+                    <div class="d-flex gap-2 overflow-x-auto pb-2 post-thumb-row" style="scrollbar-width: thin;">
+                        <!-- Thumbnail ảnh chính -->
+                        <div class="post-thumb-item active" onclick="changeMainImage('<?= $img_src ?>', this)">
+                            <img src="<?= $img_src ?>" class="w-100 h-100" style="object-fit:cover;" onerror="this.src='<?= base_url('assets/images/default_book.jpg') ?>';">
+                        </div>
+                        
+                        <!-- Thumbnails ảnh phụ -->
+                        <?php foreach($additional_images as $img): 
+                            $sub_path = FCPATH . $img['image_url'];
+                            $sub_src = (file_exists($sub_path)) ? base_url($img['image_url']) : '';
+                            if(!$sub_src) continue;
+                        ?>
+                        <div class="post-thumb-item" onclick="changeMainImage('<?= $sub_src ?>', this)">
+                            <img src="<?= $sub_src ?>" class="w-100 h-100" style="object-fit:cover;">
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <div class="text-muted mt-1 text-center" style="font-size:0.72rem;">
+                        <i class="fas fa-info-circle me-1"></i>Click để xem ảnh chi tiết
+                    </div>
+                </div>
+                <?php endif; ?>
             </div>
             <!-- Info -->
             <div class="col-md-7 p-4 d-flex flex-column">
@@ -253,3 +318,25 @@
         <?php endif; ?>
     </div>
 </div>
+
+<!-- Script đổi ảnh chi tiết như Shopee -->
+<script>
+function changeMainImage(newSrc, thumbElement) {
+    const mainDisplay = document.getElementById('mainImageDisplay');
+    if (!mainDisplay) return;
+
+    // Tạo hiệu ứng mờ dần nhẹ (fade effect)
+    mainDisplay.style.opacity = '0.3';
+
+    setTimeout(() => {
+        mainDisplay.src = newSrc;
+        mainDisplay.style.opacity = '1';
+    }, 120);
+
+    // Cập nhật trạng thái viền đỏ/xanh nổi bật của thumbnail active
+    document.querySelectorAll('.post-thumb-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    thumbElement.classList.add('active');
+}
+</script>

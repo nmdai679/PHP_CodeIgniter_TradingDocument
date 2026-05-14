@@ -79,6 +79,13 @@ class Trade_model extends CI_Model
         return $this->db->get()->row_array();
     }
 
+    // Lấy danh sách ảnh phụ của bài viết
+    public function get_post_images($post_id) {
+        $this->db->where('post_id', $post_id);
+        $this->db->order_by('id', 'ASC');
+        return $this->db->get('post_images')->result_array();
+    }
+
     public function get_categories()
     {
         return $this->db->get('categories')->result_array();

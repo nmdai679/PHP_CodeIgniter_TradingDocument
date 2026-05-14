@@ -63,6 +63,7 @@ class Trade extends CI_Controller {
         $data['post']       = $this->Trade_model->get_post_detail($id);
         $data['categories'] = $this->Trade_model->get_categories();
         $data['comments']   = $this->Comment_model->get_comments_by_post($id);
+        $data['additional_images'] = $this->Trade_model->get_post_images($id);
 
         if (!$data['post']) {
             show_404();
@@ -142,6 +143,34 @@ class Trade extends CI_Controller {
         ];
 
         $this->Trade_model->insert_post($post_data);
+        $post_id = $this->db->insert_id();
+
+        // UPLOAD NHIỀU ẢNH CHI TIẾT (Multi-Image Flow)
+        if ($post_id && !empty($_FILES['additional_images']['name'][0])) {
+            $filesCount = count($_FILES['additional_images']['name']);
+            // Giới hạn tối đa 5 ảnh chi tiết để tối ưu lưu trữ
+            $limitCount = min($filesCount, 5);
+
+            for ($i = 0; $i < $limitCount; $i++) {
+                if (empty($_FILES['additional_images']['name'][$i])) continue;
+
+                $_FILES['tmp_file']['name']     = $_FILES['additional_images']['name'][$i];
+                $_FILES['tmp_file']['type']     = $_FILES['additional_images']['type'][$i];
+                $_FILES['tmp_file']['tmp_name'] = $_FILES['additional_images']['tmp_name'][$i];
+                $_FILES['tmp_file']['error']    = $_FILES['additional_images']['error'][$i];
+                $_FILES['tmp_file']['size']     = $_FILES['additional_images']['size'][$i];
+
+                $this->upload->initialize($config);
+
+                if ($this->upload->do_upload('tmp_file')) {
+                    $fileData = $this->upload->data();
+                    $this->db->insert('post_images', [
+                        'post_id'   => $post_id,
+                        'image_url' => 'assets/uploads/' . $fileData['file_name']
+                    ]);
+                }
+            }
+        }
 
         if ($final_status === 'available') {
             $this->session->set_flashdata('success', '✅ Đăng bài thành công!');
