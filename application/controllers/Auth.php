@@ -80,21 +80,21 @@ class Auth extends CI_Controller {
 
     // Xử lý đăng ký
     public function register_post() {
-        $email_prefix = $this->input->post('email_prefix', TRUE);
+        $email = $this->input->post('email', TRUE);
         $username = $this->input->post('username', TRUE);
         $password = $this->input->post('password');
         $confirm  = $this->input->post('confirm_password');
         $full_name = $this->input->post('full_name', TRUE);
 
         // Kiểm tra trống
-        if (empty($email_prefix) || empty($username) || empty($password) || empty($full_name)) {
+        if (empty($email) || empty($username) || empty($password) || empty($full_name)) {
             $this->session->set_flashdata('error', 'Vui lòng nhập đầy đủ các trường bắt buộc!');
             redirect('auth/register');
             return;
         }
 
         // Làm sạch và lọc bỏ đuôi nếu người dùng cố tình nhập cả email
-        $email_prefix = trim($email_prefix);
+        $email_prefix = trim($email);
         $email_prefix = str_ireplace('@student.hcmue.edu.vn', '', $email_prefix);
 
         // Tạo email hoàn chỉnh
@@ -106,7 +106,6 @@ class Auth extends CI_Controller {
             redirect('auth/register');
             return;
         }
-
         // Kiểm tra mật khẩu khớp
         if ($password !== $confirm) {
             $this->session->set_flashdata('error', 'Mật khẩu xác nhận không khớp!');
