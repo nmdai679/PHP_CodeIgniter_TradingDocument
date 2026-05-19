@@ -49,8 +49,8 @@ class Orders extends CI_Controller {
 
         if (!$order) { show_404(); }
 
-        // Chỉ người liên quan mới xem được
-        if ($order['seller_id'] != $user_id && $order['buyer_id'] != $user_id) {
+        // Chỉ người liên quan hoặc admin mới xem được
+        if ($order['seller_id'] != $user_id && $order['buyer_id'] != $user_id && $this->session->userdata('role') !== 'admin') {
             show_error('Bạn không có quyền xem đơn hàng này.', 403);
         }
 
@@ -188,6 +188,81 @@ class Orders extends CI_Controller {
         redirect('orders?tab=sell');
     }
 
+    // =========================================================================
+    // THANH TOÁN (PAYMENT FLOW)
+    // =========================================================================
+
+    // Màn hình chọn phương thức thanh toán cho người mua
+    public function checkout($order_id) {
+        $this->require_login();
+        $buyer_id = $this->session->userdata('user_id');
+        $order    = $this->Order_model->get_order_by_id($order_id);
+
+        if (!$order || $order['buyer_id'] != $buyer_id || $order['status'] !== 'confirmed') {
+            $this->session->set_flashdata('error', 'Đơn hàng không hợp lệ hoặc không ở trạng thái chờ thanh toán.');
+            redirect('orders?tab=buy');
+            return;
+        }
+
+        if ($order['payment_status'] === 'paid') {
+            $this->session->set_flashdata('success', 'Đơn hàng này đã được thanh toán!');
+            redirect('orders?tab=buy');
+            return;
+        }
+
+        $this->load->model('Wallet_model');
+        $data['wallet'] = $this->Wallet_model->get_or_create_wallet($buyer_id);
+        $data['order']  = $order;
+        $data['total_amount'] = $order['price'] * $order['quantity'];
+        $data['unread_count'] = $this->Message_model->count_unread($buyer_id);
+
+        $this->load->view('partials/header', $data);
+        $this->load->view('orders/checkout', $data);
+        $this->load->view('partials/footer');
+    }
+
+    // Xử lý thanh toán qua ví HCMUEPay
+    public function process_payment($order_id) {
+        $this->require_login();
+        $buyer_id = $this->session->userdata('user_id');
+        $order    = $this->Order_model->get_order_by_id($order_id);
+
+        if (!$order || $order['buyer_id'] != $buyer_id || $order['status'] !== 'confirmed' || $order['payment_status'] === 'paid') {
+            $this->session->set_flashdata('error', 'Đơn hàng không hợp lệ để thanh toán.');
+            redirect('orders?tab=buy');
+            return;
+        }
+
+        $amount = $order['price'] * $order['quantity'];
+
+        $this->load->model('Wallet_model');
+        $result = $this->Wallet_model->pay_order($buyer_id, $order['seller_id'], $order_id, $amount);
+
+        if ($result === TRUE) {
+            // Thanh toán thành công, cập nhật trạng thái đơn hàng
+            $this->db->where('id', $order_id)->update('orders', [
+                'payment_method' => 'wallet',
+                'payment_status' => 'paid'
+            ]);
+
+            // Gửi tin nhắn tự động cho người bán
+            $buyer_name = $this->session->userdata('full_name');
+            $this->Message_model->send_message([
+                'sender_id'   => $buyer_id,
+                'receiver_id' => $order['seller_id'],
+                'post_id'     => $order['post_id'],
+                'content'     => "💰 [{$buyer_name}] đã thanh toán thành công " . number_format($amount, 0, ',', '.') . "đ cho đơn hàng \"{$order['post_title']}\" qua Ví HCMUEPay. Tiền đã được tạm giữ, bạn có thể yên tâm giao sách ngay!",
+            ]);
+
+            $this->session->set_flashdata('success', '✅ Thanh toán thành công! Vui lòng liên hệ người bán để nhận sách.');
+            redirect('orders?tab=buy');
+        } else {
+            // Lỗi thanh toán (chủ yếu là không đủ số dư)
+            $this->session->set_flashdata('error', $result);
+            redirect('orders/checkout/' . $order_id);
+        }
+    }
+
     // Người mua xác nhận đã nhận hàng
     public function received($order_id) {
         $this->require_login();
@@ -212,6 +287,12 @@ class Orders extends CI_Controller {
 
         // Trừ số lượng sách
         $this->Trade_model->decrement_quantity($order['post_id'], $order['quantity']);
+
+        // Nếu thanh toán qua ví, giải ngân cho người bán
+        if ($order['payment_method'] === 'wallet' && $order['payment_status'] === 'paid') {
+            $this->load->model('Wallet_model');
+            $this->Wallet_model->release_escrow($order['seller_id'], $order_id, $order['price'] * $order['quantity']);
+        }
 
         // Gửi tin nhắn tự động dẫn đến trang đánh giá
         $this->Message_model->send_message([
@@ -345,16 +426,23 @@ class Orders extends CI_Controller {
 
         $this->Order_model->update_status($order_id, 'cancelled');
 
+        // Hoàn tiền nếu đã thanh toán
+        if ($order['payment_method'] === 'wallet' && $order['payment_status'] === 'paid') {
+            $this->load->model('Wallet_model');
+            $this->Wallet_model->refund_order($order['buyer_id'], $order['seller_id'], $order_id, $order['price'] * $order['quantity']);
+            $this->db->where('id', $order_id)->update('orders', ['payment_status' => 'refunded']);
+        }
+
         $other_id = ($order['buyer_id'] == $user_id) ? $order['seller_id'] : $order['buyer_id'];
         $user_name = $this->session->userdata('full_name');
         $this->Message_model->send_message([
             'sender_id'   => $user_id,
             'receiver_id' => $other_id,
             'post_id'     => $order['post_id'],
-            'content'     => "❌ [{$user_name}] đã hủy đơn hàng \"{$order['post_title']}\".",
+            'content'     => "❌ [{$user_name}] đã hủy đơn hàng \"{$order['post_title']}\"." . ($order['payment_status'] === 'paid' ? " Hệ thống đã hoàn tiền lại vào ví." : ""),
         ]);
 
-        $this->session->set_flashdata('success', 'Đã hủy đơn hàng.');
+        $this->session->set_flashdata('success', 'Đã hủy đơn hàng' . ($order['payment_status'] === 'paid' ? ' và hoàn tiền.' : '.'));
         redirect('orders');
     }
 }

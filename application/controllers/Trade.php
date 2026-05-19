@@ -70,6 +70,8 @@ class Trade extends CI_Controller {
         }
 
         $data['has_rated'] = FALSE;
+        $data['post_reviews'] = $this->Rating_model->get_ratings_for_post($id);
+        $data['post_rating_stats'] = $this->Rating_model->get_avg_rating_for_post($id);
         if ($this->session->userdata('logged_in')) {
             $uid = $this->session->userdata('user_id');
             $data['has_rated']     = $this->Rating_model->has_rated($uid, $id);
