@@ -2,6 +2,8 @@
 
 > **Nền tảng trao đổi, mua bán sách & tài liệu nội bộ dành riêng cho sinh viên Trường Đại học Sư phạm TP.HCM.**
 
+🌐 **Website Demo:** [https://pass-sach.42web.io](https://pass-sach.42web.io)
+
 **HCMUE BookSwap** là một ứng dụng Web chuyên nghiệp giúp sinh viên dễ dàng chia sẻ, thanh lý giáo trình, tài liệu học tập trong khuôn khổ cộng đồng an toàn, minh bạch và tiện lợi. 
 
 ![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)
